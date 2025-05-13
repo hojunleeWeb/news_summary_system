@@ -15,11 +15,13 @@ db_file = os.path.join(db_folder, 'user_data.db')
 if not os.path.exists(db_folder):
     os.makedirs(db_folder)
 
+# DB 파일 위치를 설정
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_file
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 init_db(app)
 
+#
 @app.route('/process_input', methods=['POST'])
 def process_input():
     if request.is_json:
@@ -44,6 +46,7 @@ def process_input():
 
 
 @app.route('/interactions', methods=['GET'])
+#db에 user input과 server response를 db에 저장하는 기본 구조
 def get_interactions():
     interactions = UserInteraction.query.order_by(UserInteraction.timestamp.desc()).limit(10).all()
     results = [{
