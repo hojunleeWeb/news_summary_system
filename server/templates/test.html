@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>입력 값 전송</title>
+        <script src="test.js"></script>
+    </head>
+    <body>
+        <h1>입력 값을 서버로 전송</h1>
+        <input type="text" id="userInput" placeholder="여기에 입력하세요" />
+        <button id="sendButton">전송</button>
+        <div id="serverResponse"></div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const sendButton = document.getElementById("sendButton");
+                const userInput = document.getElementById("userInput");
+                const serverResponseDiv = document.getElementById("serverResponse");
+
+                sendButton.addEventListener("click", function () {
+                    const inputText = userInput.value;
+                    if (inputText) {
+                        fetch("http://localhost:5000/receive_input", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ text: inputText }),
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                serverResponseDiv.textContent = data.message || data.error || "응답 없음";
+                            })
+                            .catch((error) => {
+                                serverResponseDiv.textContent = "통신 오류: " + error;
+                            });
+                    } else {
+                        serverResponseDiv.textContent = "입력 값이 없습니다.";
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
