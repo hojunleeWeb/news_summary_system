@@ -9,42 +9,43 @@ def asao_control():
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     return response, 200
 
+def add_summaryRecord(texts, session_user_id, url, summarized_text):
+    try:
+        new_interaction = SummaryRecord(user_id = session_user_id,url = url,summarization_text=summarized_text)
+        db.session.add(new_interaction)
+        db.session.commit()
+        print(f"저장 완료 - 입력: {texts[:20]}..., 답변: {summarized_text[:20]}...")
+        return jsonify({'response': summarized_text}), 201      
+    except Exception as e:
+        db.session.rollback()
+        print(f"데이터베이스 저장 오류: {e}")
+        return jsonify({'error': '데이터베이스 저장에 실패했습니다.'}), 500
+
 def save_summary():
     if request.method == 'POST':
-        if 'user_id' in session:
-            user_id = session['user_id']
-            if request.is_json:
+        if request.is_json:
                 data = request.get_json()
-                user_input = data.get('text')
-
-                if user_input:
+                texts = data.get('text')
+                url = data.get('url')
+                if texts:
                     try:
-                        summary = generate_summary(user_input)
+                        summary = generate_summary(texts)
                     except Exception as e:
                         print(f"요약 생성 오류: {e}")
                         return jsonify({'error': '요약 생성에 실패했습니다.'}), 500
-
-                    # 데이터베이스에 저장
-                    try:
-                        new_interaction = SummaryRecord(
-                            user_id=user_id,
-                            user_send_data=user_input,
-                            server_response_summarization_text=summary
-                        )
-                        db.session.add(new_interaction)
-                        db.session.commit()
-                        print(f"저장 완료 - 입력: {user_input[:20]}..., 답변: {summary[:20]}...")
-                        return jsonify({'response': summary}), 200
-                    except Exception as e:
-                        db.session.rollback()
-                        print(f"데이터베이스 저장 오류: {e}")
-                        return jsonify({'error': '데이터베이스 저장에 실패했습니다.'}), 500
+                    if 'user_id' in session:
+                        session_user_id = session['user_id']
+                        # 데이터베이스에 저장
+                        add_summaryRecord(texts, session_user_id, url, summary)
+                    else:
+                        # 로그인 없이 데이터베이스에 저장
+                        add_summaryRecord(texts, None, url, summary)
+                    return jsonify({'response': summary}), 200 
+                    
                 else:
                     return jsonify({'error': '입력 값이 없습니다.'}), 400
-            else:
-                return jsonify({'error': 'JSON 형식의 요청이 아닙니다.'}), 400
         else:
-            return jsonify({'error': '로그인이 필요합니다.'}), 401
+            return jsonify({'error': 'JSON 형식의 요청이 아닙니다.'}), 400
     else:
         return jsonify({'error': 'POST 요청만 허용됩니다.'}), 405
 
@@ -57,7 +58,6 @@ def register_routes(app):
         elif request.method == 'POST':
             return save_summary() # save_summary 함수 호출
             
-
     #get_record로 GET 요청을 받으면 수행할 함수 -> 요약 이력 기능을 수행할 때 실행할 함수
     @app.route('/get_record', methods=['GET', 'OPTIONS'])
     def get_record():
@@ -68,7 +68,7 @@ def register_routes(app):
             interactions = SummaryRecord.query.order_by(SummaryRecord.timestamp.desc()).limit(10).all()
             results = [{
                 'id': interaction.id,
-                'input': interaction.user_input,
+                'input': interaction.texts,
                 'response': interaction.server_response,
                 'timestamp': interaction.timestamp.isoformat()
             } for interaction in interactions]
