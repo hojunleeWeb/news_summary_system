@@ -12,7 +12,7 @@ CORS(app)
 # 데이터베이스 설정
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_folder = os.path.join(basedir, 'DB')
-db_file = os.path.join(db_folder, 'user_data.db')
+db_file = os.path.join(db_folder, 'summary_record.db')
 
 if not os.path.exists(db_folder):
     os.makedirs(db_folder)

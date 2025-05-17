@@ -1,8 +1,8 @@
 from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
 
 # 모델 및 토크나이저 로드 (전역 변수로 선언하여 한 번만 로드)
-tokenizer = PreTrainedTokenizerFast.from_pretrained("EbanLee/kobart-summary-v3")
-model = BartForConditionalGeneration.from_pretrained("EbanLee/kobart-summary-v3")
+tokenizer = PreTrainedTokenizerFast.from_pretrained("EbanLee/kobart-summary-v3-ONNX")
+model = BartForConditionalGeneration.from_pretrained("EbanLee/kobart-summary-v3-ONNX")
 
 def generate_summary(text):
     inputs = tokenizer(text, return_tensors="pt", padding="max_length", truncation=True, max_length=1026)

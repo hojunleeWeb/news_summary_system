@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from database import db, CreateDBLine
+from database import db, UserSummaryRecord
 from get_summary import generate_summary
 
 def register_routes(app):
@@ -20,7 +20,7 @@ def register_routes(app):
                     summary = generate_summary(user_input)
 
                     # 데이터베이스에 저장
-                    new_interaction = CreateDBLine(user_input=user_input, server_response=summary)
+                    new_interaction = UserSummaryRecord(user_input=user_input, server_response=summary)
                     db.session.add(new_interaction)
                     db.session.commit()
                     print(f"저장 완료 - 입력: {user_input[:20]}..., 답변: {summary[:20]}...")
@@ -32,7 +32,8 @@ def register_routes(app):
 
     @app.route('/get_record', methods=['GET'])
     def get_record():
-        interactions = CreateDBLine.query.order_by(CreateDBLine.timestamp.desc()).limit(10).all()
+        #CreateDBLine
+        interactions = UserSummaryRecord.query.order_by(UserSummaryRecord.timestamp.desc()).limit(10).all()
         results = [{
             'id': interaction.id,
             'input': interaction.user_input,

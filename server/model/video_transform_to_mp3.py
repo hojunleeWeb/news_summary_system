@@ -27,6 +27,7 @@ def download_youtube_audio(url, output_path="."):
             # 파일 확장자를 mp4에서 mp3로 변경
             import os
             base, ext = os.path.splitext(output_file)
+            # 파일명 설정
             new_file = "1" + ".mp3"
             os.rename(output_file, new_file)
             print(f"파일 이름을 '{new_file}'로 변경했습니다.")
@@ -38,5 +39,6 @@ def download_youtube_audio(url, output_path="."):
 
 if __name__ == "__main__":
     youtube_url = "https://www.youtube.com/watch?v=W7xUKCRv5is"
-    output_directory = "./temp/"
+    #변환한 mp3 파일을 저장할 디렉토리
+    output_directory = "../mp3/"
     download_youtube_audio(youtube_url, output_directory)
