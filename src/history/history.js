@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("📦 history.js loaded");
+  console.log("history.js 로드됨");
 
-  //더미 데이터
+  //예시용 데이터
   const testHistory = [
     {
       title: "SKT, '찾아가는 유심 교체·재설정 서비스' 19일 시작",
@@ -17,15 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
+  //날짜 기준으로 정렬
   const history = testHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-  const list = document.getElementById("historyList");
 
-  list.innerHTML = ""; // 초기화
+  //요약 이력 가져오기
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+
   if (history.length === 0) {
     list.innerHTML = `<tr><td colspan="4">저장된 이력이 없습니다.</td></tr>`;
     return;
   }
 
+  //각 이력 항목을 테이블 행으로 생성
   history.forEach((item, index) => {
     const row = document.createElement("tr");
 
@@ -57,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         summaryDiv.classList.add("expanded");
         button.textContent = "▲";
       }
+
     });
   });
-
 });
