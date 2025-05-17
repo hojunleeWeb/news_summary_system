@@ -3,16 +3,8 @@
     "name": "news_summarizer_system",
     "version": "1.0.0",
     "description": "원클릭 멀티모달 기사 요약 서비스",
-    "permissions": [
-        "contextMenus",
-        "activeTab",
-        "scripting",
-        "tabs",
-        "storage"
-    ],
-    "host_permissions": [
-        "<all_urls>"
-    ],
+    "permissions": ["contextMenus", "activeTab", "scripting", "tabs", "storage"],
+    "host_permissions": ["<all_urls>"],
     "background": {
         "service_worker": "src/background/background.js"
     },

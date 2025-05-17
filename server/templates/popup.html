@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
     <head>
-        <title>입력 값 처리 및 응답</title>
-        <script src="test.js"></script>
-        <script src="signup.js"></script>
-        <script src="login.js"></script>
+        <meta charset="UTF-8" />
+        <title>원클릭 멀티모달 기사 요약 서비스</title>
+        <link rel="stylesheet" href="style.css" />
     </head>
+
     <body>
-        <h1>입력 값을 서버로 전송하고 응답 받기</h1>
-        <input type="text" id="userInput" placeholder="여기에 입력하세요" width="100px" height="200px" />
-        <button id="sendButton">전송 및 응답 받기</button>
-        <div id="serverResponse" width="400px"></div>
+        <div class="top-icons">
+            <span id="settingsBtn" data-tooltip="환경설정">⚙️</span>
+            <span id="historyBtn" data-tooltip="이력조회">📑</span>
+        </div>
         <button id="loginBtn" width="50px" height="40px">로그인</button>
         <button id="signUpBtn" width="50px" height="40px">회원 가입</button>
 
@@ -42,5 +42,15 @@
                 <button type="submit" id="login_submitBtn">로그인</button>
             </form>
         </div>
+
+        <h1>원클릭 멀티모달 기사 요약 서비스</h1>
+
+        <button id="summarizeBtn">요약하기</button>
+
+        <div id="result"></div>
+
+        <script src="popup.js"></script>
+        <script src="signup.js"></script>
+        <script src="login.js"></script>
     </body>
 </html>
