@@ -5,7 +5,7 @@ from datetime import datetime
 db = SQLAlchemy()
 
 #database 로직
-class UserInteraction(db.Model):
+class CreateDBLine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_input = db.Column(db.Text, nullable=False)
     server_response = db.Column(db.Text, nullable=False)
