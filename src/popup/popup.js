@@ -1,4 +1,25 @@
 document.getElementById("summarizeBtn").addEventListener("click", async () => {
+    // 환경설정 버튼 -> 새 탭
+    const settingsBtn = document.getElementById("settingsBtn");
+    if (settingsBtn) {
+        settingsBtn.addEventListener("click", () => {
+            chrome.tabs.create({
+                url: chrome.runtime.getURL("src/settings/settings.html")
+            });
+        });
+    }
+
+    // 이력조회 버튼 -> 새 탭
+    const historyBtn = document.getElementById("historyBtn");
+    if (historyBtn) {
+        historyBtn.addEventListener("click", () => {
+            chrome.tabs.create({
+                url: chrome.runtime.getURL("src/history/history.html")
+            });
+        });
+    }
+
+
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     chrome.scripting.executeScript(
