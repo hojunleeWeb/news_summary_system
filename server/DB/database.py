@@ -1,10 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
+#sqlALchemy 객체,
 db = SQLAlchemy()
 
 #database 로직
-#
 class UserInteraction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_input = db.Column(db.Text, nullable=False)
@@ -14,6 +14,7 @@ class UserInteraction(db.Model):
     def __repr__(self):
         return f"<Interaction(input='{self.user_input}', response='{self.server_response}')>"
 
+#db 초기화
 def init_db(app):
     db.init_app(app)
     with app.app_context():
