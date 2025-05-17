@@ -9,7 +9,7 @@ def asao_control():
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     return response, 200
 
-def add_summaryRecord(texts, session_user_id, url, summarized_text):
+def add_summaryRecord(session_user_id, url, texts, summarized_text):
     try:
         new_interaction = SummaryRecord(user_id = session_user_id,url = url,summarization_text=summarized_text)
         db.session.add(new_interaction)
@@ -36,10 +36,12 @@ def save_summary():
                     if 'user_id' in session:
                         session_user_id = session['user_id']
                         # 데이터베이스에 저장
-                        add_summaryRecord(texts, session_user_id, url, summary)
+                        add_summaryRecord(session_user_id, url,texts, summary)
                     else:
                         # 로그인 없이 데이터베이스에 저장
-                        add_summaryRecord(texts, None, url, summary)
+                        # 로그인하지 않은 사용자의 요약 이력을 모두 저장 -> 로그인시 해당 정보에 대한 필터링이 필요
+                        add_summaryRecord("none", url, texts , summary)
+
                     return jsonify({'response': summary}), 200 
                     
                 else:
