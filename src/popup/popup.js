@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
+    
+    // 로그인 상태 확인
+     const loginRedirect = document.getElementById('loginRedirect');
+    if (loginRedirect) {
+        loginRedirect.addEventListener('click', () => {
+            window.open('./login/login.html', '_blank'); // 새 탭에서 열기
+        });
+    }
+    
     // 환경설정 버튼 -> 새 탭
     const settingsBtn = document.getElementById("settingsBtn");
     if (settingsBtn) {
