@@ -2,30 +2,13 @@
 <html lang="ko">
     <head>
         <meta charset="UTF-8" />
-        <title>원클릭 멀티모달 기사 요약 서비스</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>로그인</title>
         <link rel="stylesheet" href="style.css" />
     </head>
 
     <body>
-        <div class="top-icons">
-            <span id="settingsBtn" data-tooltip="환경설정">⚙️</span>
-            <span id="historyBtn" data-tooltip="이력조회">📑</span>
-        </div>
-        <div class="user-info" id="loginRedirect" style="cursor: pointer">
-            <img src="../images/login_icon.png" class="icon user-icon" alt="user" />
-            <span class="username">@Guest</span>
-        </div>
-
-        <div id="signupFormContainer" style="display: none"></div>
-        <div id="loginFormContainer" style="display: none"></div>
-
-        <h1>원클릭 멀티모달 기사 요약 서비스</h1>
-
-        <button id="summarizeBtn">요약하기</button>
-
-        <div id="result"></div>
-
-        <div class="login-container" style="display: none; position: absolute">
+        <div class="login-container">
             <h2>로그인</h2>
             <p class="subtext">가입하신 이메일과 비밀번호를 입력하세요.</p>
             <form id="signupform">
@@ -49,8 +32,7 @@
                 <button type="button" id="google-btn">Continue With Google</button>
             </form>
         </div>
-
-        <script src="popup.js"></script>
-        <script src="login/login.js"></script>
+        <script src="login.js"></script>
+        <script src="signup.js"></script>
     </body>
 </html>

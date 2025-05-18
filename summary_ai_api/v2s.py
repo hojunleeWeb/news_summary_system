@@ -9,7 +9,7 @@ def vidsumm(url: str):
         mp3f = v2m.download_youtube_audio(url, tmpdirname)
         a2t = m2t.transcribe_audio(mp3f)
         summ = gs.generate_summary(a2t)
-        return a2t, summ
+        return summ
 
 
 if __name__ == "__main__":

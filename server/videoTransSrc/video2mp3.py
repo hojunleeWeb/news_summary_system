@@ -6,10 +6,9 @@ from pydub import AudioSegment
 # pip install pytube
 # pip install pytuberfix
 
-
 def download_youtube_audio(url, output_path="."):
     """
-    주어진 유튜브 영상 URL에서 오디오를 추출하여 MP3 파일로 저장합니다.s
+    주어진 유튜브 영상 URL에서 오디오를 추출하여 MP3 파일로 저장합니다.
 
     Args:
         url (str): 유튜브 영상 URL.
@@ -17,7 +16,7 @@ def download_youtube_audio(url, output_path="."):
     """
     try:
         yt = YouTube(url, on_progress_callback=on_progress)
-        print(yt.title)
+        yt_title = yt.title
         audio_stream = yt.streams.filter(only_audio=True).first()
 
         if audio_stream:
@@ -41,16 +40,18 @@ def download_youtube_audio(url, output_path="."):
             audio = AudioSegment.from_file(output_file)
             audio.export(base + ".mp3", format="mp3")
             os.remove(output_file)
-            return base + ".mp3"
+            return base + ".mp3", yt_title
         else:
             print("해당 영상에 오디오 스트림이 없습니다.")
+            return None, None
 
     except Exception as e:
         print(f"오류 발생: {e}")
+        return None, None
 
 
-if __name__ == "__main__":
-    youtube_url = "https://www.youtube.com/watch?v=W7xUKCRv5is"
-    # 변환한 mp3 파일을 저장할 디렉토리
-    output_directory = "../mp3/"
-    download_youtube_audio(youtube_url, output_directory)
+# if __name__ == "__main__":
+#     youtube_url = "https://www.youtube.com/watch?v=W7xUKCRv5is"
+#     # 변환한 mp3 파일을 저장할 디렉토리
+#     output_directory = "../mp3/"
+#     download_youtube_audio(youtube_url, output_directory)

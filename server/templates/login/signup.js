@@ -1,28 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const signupButton = document.getElementById("signUpBtn");
-    const signupFormContainer = document.getElementById("signupFormContainer");
+    const signupButton = document.getElementById("signup-btn");
+    const signupFormContainer = document.getElementById("login-container");
     const signupForm = document.getElementById("signupForm");
-    const submitButton = document.getElementById("signup_submitBtn");
-
-    // 회원가입 버튼 클릭 시 폼 표시
-    if (signupButton && signupFormContainer) {
-        signupButton.addEventListener("click", function () {
-            if (signupFormContainer.style.display == "block") {
-                signupFormContainer.style.display = "none";
-            } else {
-                signupFormContainer.style.display = "block";
-            }
-            // 또는 'flex' 등 원하는 레이아웃 방식
-        });
-    }
 
     // 가입 버튼 클릭 시 서버로 데이터 전송
     if (signupForm && submitButton) {
         signupForm.addEventListener("submit", function (event) {
             event.preventDefault(); // 기본 폼 제출 동작 방지
 
-            const userId = document.getElementById("signup_userId").value;
-            const password = document.getElementById("signup_password").value;
+            const userId = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
 
             fetch(fetch_url + "/signup", {
                 // Flask 서버의 회원가입 엔드포인트
