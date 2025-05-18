@@ -22,8 +22,17 @@ function extractPageText() {
 
 //크롬 확장 프로그램으로 전달
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "getText") {
+    if (request.action === "getTextAndTitle") {
         const text = extractPageText();
-        sendResponse({ text });
+        const title = document.title || "제목 없음";
+        sendResponse({ text, title });
     }
+});
+
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "getTextAndTitle") {
+    console.log("content.js: getTextAndTitle 요청 받음");
+    sendResponse({ text: "테스트 본문", title: "테스트 제목" });
+  }
 });

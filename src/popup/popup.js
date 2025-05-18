@@ -35,8 +35,11 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
+                //로그 출력
+                console.log("현재 탭:", tab);
+
                 // 현재 탭이 유효한지 확인
-                chrome.tabs.sendMessage(tab.id, { action: "getText" }, (response) => {
+                chrome.tabs.sendMessage(tab.id, { action: "getTextAndTitle" }, (response) => {
                     if (chrome.runtime.lastError || !response || !response.text) {
                         console.error("본문 추출 실패", chrome.runtime.lastError);
                         updateResult("본문 추출 중 오류가 발생했습니다.");
@@ -45,6 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const url = tab.url;
                     const pageText = response.text;
+                    const pageTitle = response.title;
+
+                    // 로그 출력
+                    console.log("요약 요청 데이터:", {
+                        url: url,
+                        title: pageTitle,
+                        textLength: pageText.length,
+                        date: new Date().toISOString(),
+                    });
 
                     // 사용자 설정 가져오기
                     chrome.storage.local.get(
@@ -54,16 +66,16 @@ document.addEventListener("DOMContentLoaded", () => {
                             const fontSize = settings.summaryFontSize || 5;
                             const outputFormat = settings.summaryOutputFormat || "inline";
 
-                            chrome.storage.local.set({ savedUrl: url, savedText: pageText }, () => {
-                                console.log("본문 저장 완료");
-                                updateResult(pageText, fontSize);
-                            });
-
-
                             // 서버에 전송
-                            sendToServer(url, pageText, language, fontSize, outputFormat);
+                            sendToServer(url, pageText, language, fontSize, outputFormat, (summary) => {
+                                //로그 출력
+                                console.log("서버로부터 받은 요약:", summary);
+
+                                saveHistory(url, pageText, pageTitle, summary);
+                            });
                         });
                 });
+
 
             } catch (error) {
                 console.error("오류 발생:", error);
@@ -82,7 +94,7 @@ function updateResult(message) {
 }
 
 // 서버에 POST 요청 보내는 함수
-function sendToServer(url, text, language, fontSize, outputFormat) {
+function sendToServer(url, text, language, fontSize, outputFormat, callback) {
     fetch("http://localhost:5000/api/summary/url", {
         method: "POST",
         headers: {
@@ -92,12 +104,9 @@ function sendToServer(url, text, language, fontSize, outputFormat) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log("서버 요약 결과:", data);
             const summary = data.summary || "요약 결과를 받지 못했습니다.";
 
-            // outputFormat에 따라 다르게 출력
             if (outputFormat === "popup") {
-                // 팝업창으로 출력
                 const popup = window.open("", "summaryPopup", "width=400,height=300");
                 if (popup) {
                     popup.document.body.innerHTML = `<p style="font-size:${fontSize}px;">${summary}</p>`;
@@ -105,12 +114,40 @@ function sendToServer(url, text, language, fontSize, outputFormat) {
                     alert("팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.");
                 }
             } else {
-                // 인라인 출력
                 updateResult(summary);
             }
+
+            if (callback) callback(summary);
         })
         .catch(err => {
             console.error("서버 오류:", err);
             updateResult("서버 요청 중 오류가 발생했습니다.");
         });
+}
+
+
+//이력 날짜순 정렬 저장
+function saveHistory(url, text, title, summary) {
+    const today = new Date().toISOString();
+
+    chrome.storage.local.get(["summaryHistory"], (result) => {
+        const historyArray = result.summaryHistory || [];
+
+        const newEntry = {
+            url,
+            text,
+            title,
+            summary,
+            date: today
+        };
+
+        historyArray.unshift(newEntry);
+
+        // 최신 날짜 순으로 정렬
+        historyArray.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        chrome.storage.local.set({ summaryHistory: historyArray }, () => {
+            console.log("요약 이력 저장 완료");
+        });
+    });
 }
