@@ -1,10 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // 로그인 상태 확인
-    const loginRedirect = document.getElementById('loginRedirect');
+    const loginRedirect = document.getElementById("loginRedirect");
     if (loginRedirect) {
-        loginRedirect.addEventListener('click', () => {
-            window.open('./login/login.html', '_blank');
+        loginRedirect.addEventListener("click", () => {
+            let login_container = document.getElementById("login-container");
+            if (login_container.style.display == "none") {
+                login_container.style.display = "block";
+            } else {
+                login_container.style.display = "none";
+            }
         });
     }
 
