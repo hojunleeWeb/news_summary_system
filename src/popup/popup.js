@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (settingsBtn) {
         settingsBtn.addEventListener("click", () => {
             chrome.tabs.create({
-                url: chrome.runtime.getURL("src/settings/settings.html")
+                url: chrome.runtime.getURL("src/settings/settings.html"),
             });
         });
     }
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (historyBtn) {
         historyBtn.addEventListener("click", () => {
             chrome.tabs.create({
-                url: chrome.runtime.getURL("src/history/history.html")
+                url: chrome.runtime.getURL("src/history/history.html"),
             });
         });
     }
@@ -40,13 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     // url과 본문 텍스트를 저장
                     chrome.storage.local.set({ savedUrl: url, savedText: pageText }, () => {
                         console.log("본문 저장 완료");
-                        updateResult(pageText);  // 확인용 출력
+                        updateResult(pageText); // 확인용 출력
                     });
 
                     //서버에 url과 본문 텍스트 전송
                     sendToServer(url, pageText);
                 });
-
             } catch (error) {
                 console.error("오류 발생:", error);
                 updateResult("오류가 발생했습니다.");
@@ -68,16 +67,16 @@ function sendToServer(url, text) {
     fetch("http://localhost:5000/api/summary/url", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url, text })
+        body: JSON.stringify({ url, text }),
     })
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
             console.log("서버 요약 결과:", data);
             updateResult(data.summary || "요약 결과를 받지 못했습니다.");
         })
-        .catch(err => {
+        .catch((err) => {
             console.error("서버 오류:", err);
             updateResult("서버 요청 중 오류가 발생했습니다.");
         });

@@ -21,14 +21,12 @@ class SummaryRecord(db.Model):
     def __repr__(self):
         return f"<SummaryRecord(input='{self.user_send_data}', response='{self.server_response_summarization_text}')>"
 
-
 class User(db.Model):
     user_id = db.Column(db.String(80), primary_key = True, nullable=False)
     user_pw = db.Column(db.String(120), nullable = False)
 
     def __repr__(self):
         return f"<User(input='{self.user_id}', response='{self.user_pw}')>"
-
 
 #db 초기화
 def init_db(app):

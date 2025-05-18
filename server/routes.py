@@ -67,11 +67,13 @@ def register_routes(app):
         if request.method == 'OPTIONS':
             return asao_control()
         elif request.method == 'GET':
-            interactions = SummaryRecord.query.order_by(SummaryRecord.timestamp.desc()).limit(10).all()
+            data = request.get_json()
+            user_id = data.get('user_id')
+
+            interactions = SummaryRecord.query.filter_by(user_id=user_id).all()
             results = [{
-                'id': interaction.id,
-                'input': interaction.texts,
-                'response': interaction.server_response,
+                'url' : interaction.url,
+                'response': interaction.summarization_text,
                 'timestamp': interaction.timestamp.isoformat()
             } for interaction in interactions]
             return jsonify(results), 200
