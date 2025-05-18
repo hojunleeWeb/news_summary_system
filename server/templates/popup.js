@@ -1,5 +1,10 @@
 let resultDiv = document.getElementById("result");
 
+//pc 버전
+let fetch_url = "http://192.168.0.67:5000";
+//노트북 버전
+//let fetch_url = "http://192.168.0.128:5000";
+
 document.getElementById("summarizeBtn").addEventListener("click", async () => {
     // // 환경설정 버튼 -> 새 탭
     // const settingsBtn = document.getElementById("settingsBtn");
@@ -83,7 +88,7 @@ function extractNewData() {
 //기사 전체 텍스트와 해당 기사가 게재된 url을 인자로 받아 서버로 POST 요청을 전송
 function get_summary(inputText, url) {
     if (inputText) {
-        fetch("http://192.168.0.128:5000/post_summary", {
+        fetch(fetch_url + "/post_summary", {
             // "/predict" -> "/post_summary" 로 수정
             method: "POST",
             headers: {

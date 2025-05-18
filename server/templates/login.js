@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const userId = document.getElementById("login_userId").value;
             const password = document.getElementById("login_password").value;
 
-            fetch("http://127.0.0.1:5000/login", {
+            fetch(fetch_url + "/login", {
                 // Flask 서버의 로그인 엔드포인트
                 method: "POST",
                 headers: {

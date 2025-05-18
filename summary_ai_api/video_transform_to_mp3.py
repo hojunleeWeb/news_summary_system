@@ -9,7 +9,7 @@ from pydub import AudioSegment
 
 def download_youtube_audio(url, output_path="."):
     """
-    주어진 유튜브 영상 URL에서 오디오를 추출하여 MP3 파일로 저장합니다.s
+    주어진 유튜브 영상 URL에서 오디오를 추출하여 MP3 파일로 저장합니다.
 
     Args:
         url (str): 유튜브 영상 URL.
