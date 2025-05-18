@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html lang="ko">
-    <head>
-        <meta charset="UTF-8" />
-        <title>원클릭 멀티모달 기사 요약 서비스</title>
-        <link rel="stylesheet" href="style.css" />
-    </head>
+<head>
+  <meta charset="UTF-8">
+  <title>원클릭 멀티모달 기사 요약 서비스</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 
-    <body>
-        <div class="top-icons">
-            <span id="settingsBtn" data-tooltip="환경설정">⚙️</span>
-            <span id="historyBtn" data-tooltip="이력조회">📑</span>
-        </div>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="user-info" id="loginRedirect" style="cursor: pointer;">
+        <img src="../images/login_icon.png" class="icon user-icon" alt="user">
+        <span class="username">@Guest</span>
+      </div>
+      <div class="icons">
+        <span id="settingsBtn" title="환경설정">⚙️</span>
+        <span id="historyBtn" title="이력조회">📑</span>
+      </div>
+    </div>
 
-        <h1>원클릭 멀티모달 기사 요약 서비스</h1>
+    <h1 class="title">원클릭 멀티모달 기사 요약 서비스</h1>
 
-        <button id="summarizeBtn">요약하기</button>
+    <button id="summarizeBtn">요약하기</button>
+    <div id="result"></div>
+  </div>
 
-        <div id="result"></div>
-
-        <script src="popup.js"></script>
-    </body>
+  <script src="popup.js"></script>
+  <script src="login.js"></script>
+</body>
 </html>
