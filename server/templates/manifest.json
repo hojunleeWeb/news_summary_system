@@ -5,7 +5,19 @@
     "description": "원클릭 멀티모달 기사 요약 서비스",
     "permissions": ["contextMenus", "activeTab", "scripting", "tabs", "storage"],
     "host_permissions": ["<all_urls>"],
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ],
     "action": {
         "default_popup": "popup.html"
+    },
+    "icons": {
+        "16": "images/icon-16.png",
+        "32": "images/icon-32.png",
+        "48": "images/icon-48.png",
+        "128": "images/icon-128.png"
     }
 }

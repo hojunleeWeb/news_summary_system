@@ -1,8 +1,3 @@
-//pc 버전
-let fetch_url = "http://192.168.0.67:5000";
-//노트북 버전
-//let fetch_url = "http://192.168.0.128:5000";
-
 document.addEventListener("DOMContentLoaded", function () {
     const loginBtn = document.getElementById("login-btn");
     const googleBtn = document.getElementById("google-btn");
