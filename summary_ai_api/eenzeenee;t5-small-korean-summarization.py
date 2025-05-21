@@ -56,4 +56,10 @@ if __name__ == "__main__":
 
 이소원 인턴 기자(cometrue@newsis.com)"""
     summary = generate_summary(image_path, text)
+    
+    # write a json with text-summary pair
+    with open("summary.json", "w") as f:
+        f.write('{"text": "' + text.replace('"', '\\"') + '", "summary": "' + summary.replace('"', '\\"') + '"}')
+        
+    # print the summary
     print(summary)
