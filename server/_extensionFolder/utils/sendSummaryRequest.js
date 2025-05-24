@@ -1,8 +1,10 @@
-// sendRequest 함수
+// src/api/summaryApi.js (예시 파일 경로)
 
-// language 속성은 일단 주석 처리
-//async function sendSummaryRequest(url, text, title, language, fontSize, outputFormat, isYoutube, fetch_url) {
-async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYoutube, fetch_url) {
+import { updateResult } from "../utils/updateResult.js"; // updateResult 함수 임포트
+
+// sendSummaryRequest 함수
+// async function sendSummaryRequest(url, text, title, language, fontSize, outputFormat, isYoutube, fetch_url) { // 기존 주석 처리된 라인
+export async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYoutube, fetch_url) {
     const payload = {
         url: url,
         //language : language, // 번역 모델이 추가되면 번역을 서버가 수행해야하니 payload에 포함
@@ -20,7 +22,7 @@ async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYo
     }
 
     // 결과 메시지를 초기화하거나 "요약 중..."으로 변경하여 사용자에게 피드백 제공
-    updateResult("요약 중...");
+    updateResult("요약 중..."); // 임포트된 updateResult 사용
 
     try {
         const response = await fetch(fetch_url + "/post_summary", {
@@ -51,11 +53,11 @@ async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYo
                 popup.document.title = "요약 결과";
             } else {
                 alert("팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.");
-                updateResult("팝업이 차단되었습니다."); // 팝업이 차단되면 팝업에도 메시지 표시
+                updateResult("팝업이 차단되었습니다."); // 임포트된 updateResult 사용
             }
         } else {
             // 이 함수는 팝업 HTML에서 결과를 표시하는 요소를 업데이트합니다.
-            updateResult(summary);
+            updateResult(summary); // 임포트된 updateResult 사용
         }
 
         // TODO: 요약이 성공적으로 완료되면 여기에서 renderHistory를 호출하지 않고,
@@ -64,6 +66,6 @@ async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYo
         // 예를 들어, summarizeBtn 리스너에서 sendRequest 호출 후 `await`를 사용하여 기다린 다음 saveHistory를 호출합니다.
     } catch (error) {
         console.error("서버 요청 또는 응답 처리 중 오류 발생:", error);
-        updateResult(`요약 요청 실패: ${error.message}`);
+        updateResult(`요약 요청 실패: ${error.message}`); // 임포트된 updateResult 사용
     }
 }

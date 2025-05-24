@@ -4,6 +4,7 @@ import { setupSettings } from "../setting/setting.js";
 import { setupSignupHandlers } from "../login/signup.js";
 import { setupLoginHandlers } from "../login/login.js";
 import { updateResult } from "../utils/updateResult.js"; //
+import { sendSummaryRequest } from "../utils/sendSummaryRequest.js"; // 요약 요청을 보내는 함수
 
 // 서버 URL 설정
 let fetch_url = "http://192.168.0.127:5000";
