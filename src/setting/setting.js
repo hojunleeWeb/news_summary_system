@@ -1,5 +1,3 @@
-// popup/setting.js
-
 /**
  * 환경설정 폼 관련 이벤트 핸들러를 설정합니다.
  * @param {HTMLElement} settingsContainer - 환경설정 컨테이너 DOM 요소
@@ -10,7 +8,8 @@ export function setupSettings(settingsContainer, loginContainer, updateResult) {
     // 모든 설정 관련 요소는 setupSettings 함수 내부에서 캐싱
     const settingsBtn = document.getElementById("settingsBtn");
     const saveSettingsBtn = document.getElementById("saveSettingsBtn");
-    //const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+    const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+    const summaryLanguageSelect = document.getElementById("summaryLanguage"); // 가정: HTML에 추가된 선택 요소
     const summaryFontSizeInput = document.getElementById("summaryFontSize");
     const summaryOutputFormatSelect = document.getElementById("summaryOutputFormat");
 
