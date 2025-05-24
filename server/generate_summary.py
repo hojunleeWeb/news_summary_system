@@ -18,5 +18,7 @@ def generate_summary(text):
         repetition_penalty=1.5,
         no_repeat_ngram_size=15,
     )
+    
     result = tokenizer.decode(summary_text_ids[0], skip_special_tokens=True)
+    print("요약 생성 결과: ", result)
     return result

@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     // 로그인 상태 확인
     const loginRedirect = document.getElementById("loginRedirect");
     if (loginRedirect) {
@@ -18,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (settingsBtn) {
         settingsBtn.addEventListener("click", () => {
             chrome.tabs.create({
-                url: chrome.runtime.getURL("src/settings/settings.html")
+                url: chrome.runtime.getURL("src/settings/settings.html"),
             });
         });
     }
@@ -28,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (historyBtn) {
         historyBtn.addEventListener("click", () => {
             chrome.tabs.create({
-                url: chrome.runtime.getURL("src/history/history.html")
+                url: chrome.runtime.getURL("src/history/history.html"),
             });
         });
     }
@@ -70,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             const language = settings.summaryLanguage || "한국어";
                             const fontSize = settings.summaryFontSize || 5;
                             const outputFormat = settings.summaryOutputFormat || "inline";
-
                             // 서버에 전송
                             sendToServer(url, pageText, language, fontSize, outputFormat, (summary) => {
                                 //로그 출력
@@ -78,10 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                                 saveHistory(url, pageText, pageTitle, summary);
                             });
-                        });
+                        }
+                    );
                 });
-
-
             } catch (error) {
                 console.error("오류 발생:", error);
                 updateResult("오류가 발생했습니다.");
@@ -103,12 +100,12 @@ function sendToServer(url, text, language, fontSize, outputFormat, callback) {
     fetch("http://localhost:5000/api/summary/url", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url, text, language, fontSize })
+        body: JSON.stringify({ url, text, language, fontSize }),
     })
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
             const summary = data.summary || "요약 결과를 받지 못했습니다.";
 
             if (outputFormat === "popup") {
@@ -124,12 +121,11 @@ function sendToServer(url, text, language, fontSize, outputFormat, callback) {
 
             if (callback) callback(summary);
         })
-        .catch(err => {
+        .catch((err) => {
             console.error("서버 오류:", err);
             updateResult("서버 요청 중 오류가 발생했습니다.");
         });
 }
-
 
 //이력 날짜순 정렬 저장
 function saveHistory(url, text, title, summary) {
@@ -143,7 +139,7 @@ function saveHistory(url, text, title, summary) {
             text,
             title,
             summary,
-            date: today
+            date: today,
         };
 
         historyArray.unshift(newEntry);

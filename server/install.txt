@@ -1,8 +1,0 @@
-pip install -U openai-whisper
-
-pip install transformers
-
-pip install flask-cors
-
-pip install flask-sqlalchemy
-

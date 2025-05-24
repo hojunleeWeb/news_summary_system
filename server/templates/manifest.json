@@ -1,18 +1,12 @@
 {
     "manifest_version": 3,
-    "name": "news_summarizer_system",
+    "name": "뉴스요약 서버버전",
     "version": "1.0.0",
     "description": "원클릭 멀티모달 기사 요약 서비스",
     "permissions": ["contextMenus", "activeTab", "scripting", "tabs", "storage"],
     "host_permissions": ["<all_urls>"],
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"],
-            "js": ["content.js"]
-        }
-    ],
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup/popup.html"
     },
     "icons": {
         "16": "images/icon-16.png",

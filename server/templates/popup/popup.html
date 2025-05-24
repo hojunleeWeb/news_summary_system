@@ -4,15 +4,21 @@
         <meta charset="UTF-8" />
         <title>원클릭 멀티모달 기사 요약 서비스</title>
         <link rel="stylesheet" href="style.css" />
+        <script src="popup.js"></script>
+        <script src="login.js"></script>
+        <script src="signup.js"></script>
+        <script src="sendSummaryReqeust.js"></script>
     </head>
 
     <body>
-        <div class="top-icons">
-            <span id="settingsBtn" data-tooltip="환경설정">⚙️</span>
-            <span id="historyBtn" data-tooltip="이력조회">📑</span>
-        </div>
-        <div class="user-info" id="loginRedirect" style="cursor: pointer">
-            <span class="username">로그인</span>
+        <div class="header">
+            <div class="user-info" id="loginRedirect" style="cursor: pointer">
+                <span class="username">로그인</span>
+            </div>
+            <div class="top-icons">
+                <span id="settingsBtn" data-tooltip="환경설정">⚙️</span>
+                <span id="historyBtn" data-tooltip="이력조회">📑</span>
+            </div>
         </div>
 
         <div id="signupFormContainer" style="display: none"></div>
@@ -43,15 +49,10 @@
                     <a href="#">비밀번호 찾기</a>
                 </div>
 
-                <button type="submit" id="login-btn">로그인</button>
-                <button type="button" id="signup-btn">회원가입</button>
-                <button type="button" id="google-btn">Continue With Google</button>
+                <button type="submit" id="login-btn" class="action-btn">로그인</button>
+                <button type="button" id="signup-btn" class="action-btn">회원가입</button>
+                <button type="button" id="google-btn" class="action-btn">Continue With Google</button>
             </form>
         </div>
-
-        <script src="popup.js"></script>
-        <script src="login.js"></script>
-        <script src="signup.js"></script>
-        <script src="content.js"></script>
     </body>
 </html>

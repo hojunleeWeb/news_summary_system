@@ -1,9 +1,9 @@
 from flask import request, jsonify, make_response, session
 from database import db, SummaryRecord, User
 from videoTransSrc.video2text import video2text
-from routerSrc.asao_control import asao_control
-from routerSrc.savesummary import save_summary
-from routerSrc.loginAuthDbTable import find_user_by_credentials
+from video_processing.asao_control import asao_control
+from video_processing.response_summary import response_summary
+from video_processing.login_auth_db import find_user_by_credentials
 
 
 # /post_summary 라우트에서 save_summary 함수를 호출하도록 수정
@@ -13,9 +13,8 @@ def register_routes(app):
         if request.method == 'OPTIONS':
             return asao_control()
         elif request.method == 'POST':
-            return save_summary() # save_summary 함수 호출
+            return response_summary() # response_summary 함수 호출
         
-            
     #get_record로 GET 요청을 받으면 수행할 함수 -> 요약 이력 기능을 수행할 때 실행할 함수
     @app.route('/get_record', methods=['GET', 'OPTIONS'])
     def get_record():

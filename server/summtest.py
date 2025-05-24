@@ -1,4 +1,4 @@
-from get_summary import generate_summary
+from server.generate_summary import generate_summary
 article_text = """
 [서울=뉴시스] 심지혜 기자 = 방송통신위원회가 SK텔레콤의 사이버 침해 사고와 관련해 국민 불안감을 악용한 불법스팸 대응 체계에 대해 점검했다.
 

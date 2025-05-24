@@ -2,7 +2,8 @@
 from flask import request, jsonify, session
 from database import db, SummaryRecord
 
-def add_summaryRecord(session_user_id, url, texts, summarized_text):
+# 요약 결과를 데이터베이스에 저장하는 함수
+def add_summary_record(session_user_id, url, texts, summarized_text):
     try:
         new_interaction = SummaryRecord(user_id = session_user_id,url = url,summarization_text=summarized_text)
         db.session.add(new_interaction)
