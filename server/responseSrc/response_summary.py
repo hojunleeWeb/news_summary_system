@@ -1,7 +1,7 @@
 from flask import request, jsonify, session
 from database import SummaryRecord
 from generate_summary import generate_summary
-from video_processing.add_summary_record import add_summary_record
+from add_summary_record import add_summary_record
 from videoTransSrc.video2text import video2text
 
 # 사용자가 post_summary 요청을 보낼 때 호출되는 함수
@@ -21,7 +21,11 @@ def response_summary():
             if interaction:
                 summary_text = interaction.summarization_text
                 print(f"서버: DB에서 동일 URL 요약 발견. 요약 길이: {len(summary_text) if summary_text else 0}")
-                add_summary_record(user_id, url, texts, summary_text)
+                # user_id가 none이 아닐 때 = 로그인을 한 상태일 때만 기록
+                # db에 none이 계속 추가되는 일을 방지
+                if(user_id != 'none'):
+                    add_summary_record(user_id, url, texts, summary_text)
+                    
                 # 여기서 배열 대신 단일 객체를 반환하도록 수정
                 return jsonify({'response': summary_text}), 200 # results 변수 삭제, 직접 딕셔너리 반환
             

@@ -112,6 +112,7 @@ function updateResult(message) {
  * @param {string} defaultTitle - 현재 탭의 기본 제목
  * @returns {object} { url: string, urlType: string, text: string|null, title: string, isYoutube: boolean }
  */
+
 async function getPageData(tabId, currentUrl, defaultTitle) {
     const YOUTUBE_PATTERN = /^https?:\/\/www\.(?:youtube\.com|youtu\.be)/;
     const NAVER_NEWS_PATTERN = /^https?:\/\/n\.news\.naver\.com\/article\/(\d+)\/(\d+)(?:\?.*)?$/;

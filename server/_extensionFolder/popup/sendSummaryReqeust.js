@@ -1,12 +1,12 @@
 // sendRequest 함수
-async function sendSummaryRequest(url, text, title, language, fontSize, outputFormat, isYoutube, fetch_url) {
+
+// language 속성은 일단 주석 처리
+//async function sendSummaryRequest(url, text, title, language, fontSize, outputFormat, isYoutube, fetch_url) {
+async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYoutube, fetch_url) {
     const payload = {
         url: url,
-        language: language,
-        fontSize: fontSize,
-        is_youtube: isYoutube, // 'IsYoutube' 대신 소문자 'isYoutube'를 사용하는 것이 일반적입니다.
-        // 이전 답변의 코드에서는 'isYoutube'로 전달하고 있었습니다.
-        // 이 부분은 백엔드 서버에서 어떤 이름으로 기대하는지에 따라 결정됩니다.
+        //language : language, // 번역 모델이 추가되면 번역을 서버가 수행해야하니 payload에 포함
+        isYoutube: isYoutube,
     };
 
     // YouTube가 아닌 경우에만 본문 텍스트 포함
