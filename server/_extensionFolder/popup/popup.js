@@ -30,9 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isLoggedIn) {
             const userData = JSON.parse(user);
             loginRedirect.innerHTML = `<span class="username">${userData.email}</span> (로그아웃)`;
-            loginContainer.style.display = "none";
-            summarizeBtn.style.display = "block";
             console.log("로그인 상태:", userData.email);
+            return true; // 로그인 상태를 반환
+        } else {
+            loginRedirect.innerHTML = `<span class="username">로그인</span>`;
+            console.log("로그아웃 상태");
+            return false; // 로그인 상태를 반환
         }
     };
 
