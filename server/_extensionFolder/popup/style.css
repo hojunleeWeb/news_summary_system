@@ -67,6 +67,10 @@ button {
     width: 100%;
     cursor: pointer;
 }
+#cancelLoginBtn {
+    /* 취소 버튼 색상 (예시) */
+    background-color: #fb968f;
+}
 
 #result {
     margin-top: 15px;

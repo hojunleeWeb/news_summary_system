@@ -1,7 +1,7 @@
 from flask import request, jsonify, session
 from database import SummaryRecord
 from generate_summary import generate_summary
-from add_summary_record import add_summary_record
+from responseSrc.add_summary_record import add_summary_record
 from videoTransSrc.video2text import video2text
 
 # 사용자가 post_summary 요청을 보낼 때 호출되는 함수
@@ -10,9 +10,10 @@ def response_summary():
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json()
+            title = data.get('title')
             texts = data.get('text')
             url = data.get('url')
-            is_youtube = data.get('isYoutube', False) # 클라이언트에서 isYoutube로 전송
+            is_youtube = data.get('isYoutube', False) # 클라이언트에서 _y로 전송
             user_id = session.get('user_id', 'none') # 세션에 user_id가 없으면 'none'으로 처리
 
             interaction = SummaryRecord.query.filter_by(url=url).first()
@@ -24,8 +25,8 @@ def response_summary():
                 # user_id가 none이 아닐 때 = 로그인을 한 상태일 때만 기록
                 # db에 none이 계속 추가되는 일을 방지
                 if(user_id != 'none'):
-                    add_summary_record(user_id, url, texts, summary_text)
-                    
+                    add_summary_record(user_id, url, title, texts, summary_text)
+
                 # 여기서 배열 대신 단일 객체를 반환하도록 수정
                 return jsonify({'response': summary_text}), 200 # results 변수 삭제, 직접 딕셔너리 반환
             
@@ -41,7 +42,7 @@ def response_summary():
                 print(f"서버: 요약 생성 시작. 텍스트 길이: {len(texts)}")
                 try:
                     summary = generate_summary(texts)
-                    add_summary_record(user_id, url, texts, summary)
+                    add_summary_record(user_id, url,title, texts, summary)
                     print(f"서버: 요약 생성 완료. 요약 길이: {len(summary) if summary else 0}")
                     # 여기서도 배열 대신 단일 객체를 반환하도록 수정
                     return jsonify({'response': summary}), 200

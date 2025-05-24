@@ -6,6 +6,8 @@ async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYo
     const payload = {
         url: url,
         //language : language, // 번역 모델이 추가되면 번역을 서버가 수행해야하니 payload에 포함
+        title: "",
+        text: "",
         isYoutube: isYoutube,
     };
 

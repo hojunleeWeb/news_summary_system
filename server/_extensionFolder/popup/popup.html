@@ -4,10 +4,9 @@
         <meta charset="UTF-8" />
         <title>원클릭 멀티모달 기사 요약 서비스</title>
         <link rel="stylesheet" href="style.css" />
-        <script src="popup.js"></script>
-        <script src="login.js"></script>
-        <script src="signup.js"></script>
-        <script src="sendSummaryReqeust.js"></script>
+        <script src="popup.js" type="module"></script>
+        <script src="../history/history.js"></script>
+        <script src="sendSummaryRequest.js"></script>
     </head>
 
     <body>
@@ -51,8 +50,25 @@
 
                 <button type="submit" id="login-btn" class="action-btn">로그인</button>
                 <button type="button" id="signup-btn" class="action-btn">회원가입</button>
-                <button type="button" id="google-btn" class="action-btn">Continue With Google</button>
+                <button type="button" id="cancelLoginBtn" class="action-btn">취소</button>
             </form>
+        </div>
+
+        <div id="settings-container" style="display: none; padding: 15px; border-top: 1px solid #eee; margin-top: 20px">
+            <h2>환경설정</h2>
+            <div class="form-group">
+                <label for="summaryFontSize">글자 크기:</label>
+                <input type="number" id="summaryFontSize" min="10" max="24" value="14" />
+            </div>
+            <div class="form-group">
+                <label for="summaryOutputFormat">요약문 출력 방식:</label>
+                <select id="summaryOutputFormat">
+                    <option value="inline">팝업 내 표시</option>
+                    <option value="popup">새 팝업창</option>
+                </select>
+            </div>
+            <button id="saveSettingsBtn" class="action-btn">설정 저장</button>
+            <button id="closeSettingsBtn" class="action-btn">닫기</button>
         </div>
     </body>
 </html>
