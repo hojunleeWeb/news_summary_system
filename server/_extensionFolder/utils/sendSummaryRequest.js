@@ -22,7 +22,8 @@ export async function sendSummaryRequest(url, text, title, fontSize, outputForma
     }
 
     // 결과 메시지를 초기화하거나 "요약 중..."으로 변경하여 사용자에게 피드백 제공
-    updateResult("요약 중..."); // 임포트된 updateResult 사용
+    // 요약 시작 시 "요약 중..." 메시지와 함께 타이머 시작
+    updateResult("요약 중...", true);
 
     try {
         const response = await fetch(fetch_url + "/post_summary", {
@@ -57,7 +58,7 @@ export async function sendSummaryRequest(url, text, title, fontSize, outputForma
             }
         } else {
             // 이 함수는 팝업 HTML에서 결과를 표시하는 요소를 업데이트합니다.
-            updateResult(summary); // 임포트된 updateResult 사용
+            updateResult(summary, false, true); // 임포트된 updateResult 사용
         }
 
         // TODO: 요약이 성공적으로 완료되면 여기에서 renderHistory를 호출하지 않고,
