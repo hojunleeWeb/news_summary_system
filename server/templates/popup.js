@@ -1,9 +1,11 @@
 let resultDiv = document.getElementById("result");
 
 //pc 버전
-let fetch_url = "http://192.168.0.67:5000";
-//노트북 버전
-//let fetch_url = "http://192.168.0.128:5000";
+//let fetch_url = "http://192.168.0.67:5000";
+//노트북 버전 - 핫스팟
+//let fetch_url = "http://192.168.96.187:5000";
+//노트북 버전 - 스카
+let fetch_url = "http://192.168.0.127:5000";
 
 // 로그인 상태 확인
 const loginRedirect = document.getElementById("loginRedirect");
@@ -52,7 +54,7 @@ document.getElementById("summarizeBtn").addEventListener("click", async () => {
             // 유튜브 URL인 경우
             isYoutube = true;
             // extractedText는 서버에서 URL을 기반으로 처리하므로 null로 유지
-            get_summary(null, currentUrl, true);
+            get_summary(null, currentUrl, true, fetch_url);
         } else {
             // 네이버 뉴스 URL인 경우
             try {
@@ -78,7 +80,7 @@ document.getElementById("summarizeBtn").addEventListener("click", async () => {
 
                 if (result && result.length > 0 && result[0].result) {
                     extractedText = result[0].result;
-                    get_summary(extractedText, currentUrl, false);
+                    get_summary(extractedText, currentUrl, false, fetch_url);
                 } else {
                     resultDiv.textContent = "해당 페이지에서 데이터를 찾을 수 없습니다.";
                 }

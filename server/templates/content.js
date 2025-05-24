@@ -1,6 +1,5 @@
 // 기사 전체 텍스트와 해당 기사가 게재된 url을 인자로 받아 서버로 POST 요청을 전송
-function get_summary(inputText, url, IsYoutube = false) {
-    const fetch_url = "http://192.168.0.67:5000"; // 서버 URL은 여기에 정의
+function get_summary(inputText, url, IsYoutube = false, fetch_url) {
     const resultDiv = document.getElementById("result");
 
     const payload = {

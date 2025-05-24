@@ -23,6 +23,8 @@ def save_summary():
                 else:
                     return jsonify({'error': '유튜브 영상 텍스트 변환에 실패했습니다.'}), 500
 
+            #TODO
+            #동일한 url에 대한 db query 작동이 제대로 수행되지 않음
             if interaction:
                 results = [{'response': interaction.summarization_text}]
                 return jsonify(results), 200

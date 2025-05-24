@@ -31,21 +31,21 @@ def transcribe_audio(audio_file_path, model_name="base"):
         print(f"오류 발생: {e}")
         return None
 
-if __name__ == "__main__":
-    audio_file = "./server/utils/temp/1.mp3"
-    #model_to_use = input("사용할 Whisper 모델을 선택하세요 (tiny, base, small, medium, large, 기본값: base): ") or "base"
-    model_to_use = "base"
+# if __name__ == "__main__":
+#     audio_file = "./server/utils/temp/1.mp3"
+#     #model_to_use = input("사용할 Whisper 모델을 선택하세요 (tiny, base, small, medium, large, 기본값: base): ") or "base"
+#     model_to_use = "base"
 
-    transcribed_text = transcribe_audio(audio_file, model_to_use)
+#     transcribed_text = transcribe_audio(audio_file, model_to_use)
 
-    if transcribed_text:
-        print("\n변환된 텍스트:")
-        print(transcribed_text)
+#     if transcribed_text:
+#         print("\n변환된 텍스트:")
+#         print(transcribed_text)
 
-        # (선택 사항) 변환된 텍스트를 파일에 저장
-        save_to_file ='y'
-        if save_to_file == 'y':
-            output_text_file = os.path.splitext(audio_file)[0] + ".txt"
-            with open(output_text_file, "w", encoding="utf-8") as f:
-                f.write(transcribed_text)
-            print(f"텍스트가 '{output_text_file}'에 저장되었습니다.")
+#         # (선택 사항) 변환된 텍스트를 파일에 저장
+#         save_to_file ='y'
+#         if save_to_file == 'y':
+#             output_text_file = os.path.splitext(audio_file)[0] + ".txt"
+#             with open(output_text_file, "w", encoding="utf-8") as f:
+#                 f.write(transcribed_text)
+#             print(f"텍스트가 '{output_text_file}'에 저장되었습니다.")

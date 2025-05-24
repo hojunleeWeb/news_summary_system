@@ -63,6 +63,12 @@ button {
     width: 100%;
     cursor: pointer;
 }
+#loginBtn {
+    width: 33%;
+}
+#signUpBtn {
+    width: 33%;
+}
 
 #result {
     margin-top: 15px;

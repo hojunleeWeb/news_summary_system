@@ -6,7 +6,7 @@ from pydub import AudioSegment
 # pip install pytube
 # pip install pytuberfix
 
-def download_youtube_audio(url, output_path="."):
+def download_youtube_audio(url, output_path="../mp3/"):
     """
     주어진 유튜브 영상 URL에서 오디오를 추출하여 MP3 파일로 저장합니다.
 
@@ -46,6 +46,7 @@ def download_youtube_audio(url, output_path="."):
             return None, None
 
     except Exception as e:
+        print("output path : " + output_file)
         print(f"오류 발생: {e}")
         return None, None
 
