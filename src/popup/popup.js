@@ -1,231 +1,214 @@
+// popup/popup.js
+
+import { setupSettings } from "../setting/setting.js";
+import { setupSignupHandlers } from "../login/signup.js";
+import { setupLoginHandlers } from "../login/login.js";
+import { updateResult } from "../utils/updateResult.js"; //
+import { sendSummaryRequest } from "../utils/sendSummaryRequest.js"; // 요약 요청을 보내는 함수
+
+// 서버 URL 설정
+let fetch_url = "http://192.168.0.127:5000";
+
 document.addEventListener("DOMContentLoaded", () => {
     // 요소들 캐싱
     const loginRedirect = document.getElementById("loginRedirect");
     const loginContainer = document.getElementById("login-container");
-    const summarizeBtn = document.getElementById("summarizeBtn");
-    const resultDiv = document.getElementById("result");
-    const settingsBtn = document.getElementById("settingsBtn");
     const settingsContainer = document.getElementById("settings-container");
-    const summaryFontSizeInput = document.getElementById("summaryFontSize");
-    const summaryOutputFormatSelect = document.getElementById("summaryOutputFormat");
-    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
-    const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+    const summarizeBtn = document.getElementById("summarizeBtn");
     const historyBtn = document.getElementById("historyBtn");
-    
-    // 로그인
-    if (loginRedirect) {
-        loginRedirect.addEventListener("click", () => {
-            let login_container = document.getElementById("login-container");
-            if (login_container.style.display == "none") {
-                login_container.style.display = "block";
-                resultDiv.textContent = '';
-            } else {
-                login_container.style.display = "none";
+
+    // settings.js에 정의된 setupSettings 함수 호출
+    setupSettings(settingsContainer, loginContainer, updateResult); // updateResult 함수를 인자로 전달
+
+    // 로그인 상태를 업데이트하는 함수.
+    // 이 함수는 login.js와 popup.js 모두에서 사용되므로 상위 스코프에 정의합니다.
+    const updateLoginState = () => {
+        const user = localStorage.getItem("user");
+        const isLoggedIn = user && JSON.parse(user).isLoggedIn;
+
+        if (isLoggedIn) {
+            const userData = JSON.parse(user);
+            loginRedirect.innerHTML = `<span class="username">${userData.email}</span> (로그아웃)`;
+            console.log("로그인 상태:", userData.email);
+            return true; // 로그인 상태를 반환
+        } else {
+            loginRedirect.innerHTML = `<span class="username">로그인</span>`;
+            console.log("로그아웃 상태");
+            return false; // 로그인 상태를 반환
+        }
+    };
+
+    // 페이지 로드 시 로그인 상태 확인 및 UI 업데이트
+    updateLoginState();
+
+    // login.js의 setupLoginHandlers 함수 호출
+    setupLoginHandlers(fetch_url, loginRedirect, loginContainer, summarizeBtn, updateResult, updateLoginState); // updateResult 함수 전달
+    // signup.js의 setupSignupHandlers 함수 호출
+    setupSignupHandlers(fetch_url, loginContainer, summarizeBtn, updateResult); // updateResult 함수 전달
+
+    // 로그인 리디렉션 버튼 (로그인 컨테이너 토글)
+
+    // 이력조회 버튼 
+   if (historyBtn) {
+        historyBtn.addEventListener("click", async () => {
+            try {
+                // 현재 활성 탭의 ID를 가져와 Side Panel을 엽니다.
+                // manifest.json의 default_path에 설정된 history_panel.html이 열립니다.
+                const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+                if (currentTab) {
+                    await chrome.sidePanel.open({ tabId: currentTab.id });
+                }
+            } catch (error) {
+                console.error("사이드 패널을 여는 데 실패했습니다:", error);
+                updateResult("이력 조회를 열 수 없습니다. 브라우저 설정을 확인해주세요.");
             }
         });
     }
-
-    // 환경설정 버튼
-    if (settingsBtn) {
-        settingsBtn.addEventListener("click", () => {
-            if (settingsContainer.style.display === "none") {
-                settingsContainer.style.display = "block";
-                loginContainer.style.display = "none";
-                resultDiv.textContent = '';
-                loadSettings(); // 설정창 열 때 기존 설정값 불러오기
-            } else {
-                settingsContainer.style.display = "none";
-            }
-        });
-    }
     
-    // 환경설정 저장 버튼
-    if (saveSettingsBtn) {
-        saveSettingsBtn.addEventListener("click", () => {
-            const fontSize = summaryFontSizeInput.value;
-            const outputFormat = summaryOutputFormatSelect.value;
-            // chrome.storage.local에 설정값 저장
-            chrome.storage.local.set({
-                summaryFontSize: fontSize,
-                summaryOutputFormat: outputFormat
-            }, () => {
-                console.log("환경설정 저장 완료:", { fontSize, outputFormat });
-                updateResult("설정이 저장되었습니다.");
-                setTimeout(() => {
-                    resultDiv.textContent = '';
-                }, 2000);
-            });
-        });
-    }
-
-    // 환경설정 닫기 버튼
-    if (closeSettingsBtn) {
-        closeSettingsBtn.addEventListener("click", () => {
-            settingsContainer.style.display = "none";
-            resultDiv.textContent = '';
-        });
-    }
-
-    // 이력조회 버튼 -> 새 탭
-    if (historyBtn) {
-        historyBtn.addEventListener("click", () => {
-            chrome.tabs.create({
-                url: chrome.runtime.getURL("src/history/history.html"),
-            });
-        });
-    }
-
-    // 요약하기 버튼
+    // 요약하기 버튼 클릭 이벤트
     if (summarizeBtn) {
         summarizeBtn.addEventListener("click", async () => {
-            resultDiv.textContent = '기사 내용을 요약 중입니다.';
-            // 환경설정 및 로그인 컨테이너 숨기기
-            settingsContainer.style.display = 'none';
-            loginContainer.style.display = 'none';
+            updateResult("페이지 데이터 추출 중..."); // 임포트된 updateResult 사용
+            settingsContainer.style.display = "none";
+            loginContainer.style.display = "none";
+
             try {
                 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-                //로그 출력
-                console.log("현재 탭:", tab);
-
-                // 현재 탭이 유효한지 확인
-                if (!tab || !tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) {
-                    updateResult("이 페이지는 요약할 수 없습니다.");
-                    return; // 더 이상 진행하지 않고 함수 종료
+                if (!tab || !tab.id || !tab.url) {
+                    updateResult("활성 탭 정보를 가져올 수 없습니다.");
+                    console.error("활성 탭 정보를 가져올 수 없습니다.");
+                    return;
                 }
-
-                // 유튜브 URL인지 확인
-                const isYoutube = tab.url.includes("youtube.com/watch") || tab.url.includes("youtu.be/");
-
-                chrome.tabs.sendMessage(tab.id, { action: "getTextAndTitle" }, (response) => {
-                    if (chrome.runtime.lastError || !response || !response.text) {
-                        console.error("본문 추출 실패", chrome.runtime.lastError);
-                        updateResult("본문 추출 중 오류가 발생했습니다.");
-                        return;
-                    }
-                    if (!response || !response.text) {
-                        console.error("본문 추출 응답이 없거나 텍스트가 비어 있습니다.");
-                        updateResult("이 페이지에서 요약할 본문을 찾을 수 없습니다.");
-                        return;
-                    }
-
-                    const url = tab.url;
-                    const pageText = response.text;
-                    const pageTitle = response.title;
-
-                    // 로그 출력
-                    console.log("요약 요청 데이터:", {
-                        url: url,
-                        title: pageTitle,
-                        textLength: pageText.length,
-                        date: new Date().toISOString(),
-                    });
-
-                    // 사용자 설정 가져오기
-                    chrome.storage.local.get(
-                        ["summaryFontSize", "summaryOutputFormat"],
-                        (settings) => {
-                            const fontSize = settings.summaryFontSize || 14;
-                            const outputFormat = settings.summaryOutputFormat || "inline";
-                            // 서버에 전송
-                            sendToServer(url, pageText, fontSize, outputFormat, (summary) => {
-                                //로그 출력
-                                console.log("서버로부터 받은 요약:", summary);
-
-                                saveHistory(url, pageText, pageTitle, summary);
-                            });
-                        }
+                if (tab.url.startsWith("chrome://") || tab.url.startsWith("chrome-extension://")) {
+                    updateResult("이 페이지는 요약할 수 없습니다.");
+                    return;
+                }
+                const pageData = await getPageData(tab.id, tab.url, tab.title);
+                console.log("popup.js: 추출된 페이지 데이터:", pageData);
+                if (pageData.urlType === "unsupported") {
+                    updateResult("죄송합니다. 현재 페이지는 요약이 지원되지 않습니다.");
+                    return;
+                } else if (pageData.urlType !== "youtube" && (!pageData.text || pageData.text.length < 50)) {
+                    updateResult("페이지 본문 추출에 실패했거나, 충분한 텍스트를 찾을 수 없습니다.");
+                    console.error("본문 추출 실패: 텍스트 길이가 너무 짧거나 없음.", pageData);
+                    return;
+                }
+                const settings = await new Promise((resolve) => {
+                    chrome.storage.local.get(["summaryLanguage", "summaryFontSize", "summaryOutputFormat"], (items) =>
+                        resolve(items)
                     );
                 });
+                //const language = settings.summaryLanguage || "한국어";
+                const fontSize = settings.summaryFontSize || 14;
+                const outputFormat = settings.summaryOutputFormat || "inline";
+
+                await sendSummaryRequest(
+                    pageData.url,
+                    pageData.text,
+                    pageData.title,
+                    //language,
+                    fontSize,
+                    outputFormat,
+                    pageData.isYoutube,
+                    fetch_url
+                );
             } catch (error) {
-                console.error("오류 발생:", error);
-                updateResult("오류가 발생했습니다.");
+                console.error("요약 과정 중 오류 발생:", error);
+                updateResult(`오류가 발생했습니다: ${error.message}`);
             }
         });
     }
 });
 
-// 결과 메시지 업데이트
-function updateResult(message) {
-    const resultDiv = document.getElementById("result");
-    if (resultDiv) {
-        resultDiv.textContent = message;
-    }
-}
+// getPageData, sendSummaryRequest 함수는 popup.js에 그대로 유지
+async function getPageData(tabId, currentUrl, defaultTitle) {
+    const YOUTUBE_PATTERN = /^https?:\/\/www\.(?:youtube\.com|youtu\.be)/;
+    const NAVER_NEWS_PATTERN = /^https?:\/\/n\.news\.naver\.com\/article\/(\d+)\/(\d+)(?:\?.*)?$/;
 
-// 서버에 POST 요청 보내는 함수
-function sendToServer(url, text, fontSize, outputFormat,isYoutube, callback) {
-    fetch("http://localhost:5000/post_summary", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url, text, fontSize, isYoutube }),
-    })
-        .then((response) => {
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.message || '요약 서비스 오류 발생');
-                    });
-                }
-                return response.json();
-            })
-        .then((data) => {
-            const summary = data.response || "요약 결과를 받지 못했습니다.";
+    let urlType = "unsupported";
+    let extractedText = null;
+    let pageTitle = defaultTitle || "제목 없음";
+    let isYoutube = false;
 
-            if (outputFormat === "popup") {
-                const popup = window.open("", "summaryPopup", "width=400,height=300");
-                if (popup) {
-                    popup.document.body.innerHTML = `<p style="font-size:${fontSize}px;">${summary}</p>`;
-                } else {
-                    updateResult("팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.");
-                }
+    if (YOUTUBE_PATTERN.test(currentUrl)) {
+        urlType = "youtube";
+        isYoutube = true;
+    } else if (NAVER_NEWS_PATTERN.test(currentUrl)) {
+        urlType = "naver_news";
+        try {
+            const scriptResults = await chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                function: () => {
+                    const titleElement = document.querySelector(".media_end_head_title");
+                    const newsTitle = titleElement ? titleElement.innerText.trim() : document.title;
+                    const newsAreaElement = document.getElementById("dic_area");
+                    let newsArea = newsAreaElement ? newsAreaElement.innerText.trim() : null;
+
+                    if (newsArea) {
+                        newsArea = newsArea
+                            .replace(/\n\s*\n/g, "\n")
+                            .replace(/\s\s+/g, " ")
+                            .trim();
+                    } else {
+                        newsArea = document.body.innerText.trim();
+                        if (newsArea.length > 5000) {
+                            newsArea = newsArea.substring(0, 5000) + "... (전문이 아닐 수 있음)";
+                        }
+                    }
+                    return { text: newsArea, title: newsTitle };
+                },
+            });
+
+            if (scriptResults && scriptResults.length > 0 && scriptResults[0].result) {
+                extractedText = scriptResults[0].result.text;
+                pageTitle = scriptResults[0].result.title;
             } else {
-                resultDiv.innerHTML = `<p style="font-size:${fontSize}px;">${summary}</p>`;
+                console.warn("getPageData: 네이버 뉴스 스크립트 결과 없음 또는 유효하지 않음:", scriptResults);
             }
+        } catch (error) {
+            console.error("getPageData: 네이버 뉴스 데이터 추출 스크립트 오류:", error);
+        }
+    } else {
+        urlType = "general_webpage";
+        try {
+            const scriptResults = await chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                function: () => {
+                    let extracted = null;
+                    const selectors = ["article", "main", "div.article-body", "section", "body"];
+                    for (const selector of selectors) {
+                        const el = document.querySelector(selector);
+                        if (el && el.innerText && el.innerText.length > 200) {
+                            extracted = el.innerText.trim();
+                            break;
+                        }
+                    }
+                    if (!extracted) {
+                        extracted = document.body.innerText.trim();
+                        if (extracted.length > 5000) {
+                            extracted = extracted.substring(0, 5000) + "... (전문이 아닐 수 있음)";
+                        }
+                    }
+                    return { text: extracted, title: document.title || "제목 없음" };
+                },
+            });
 
-            if (callback) callback(summary);
-        })
-        .catch((err) => {
-            console.error("서버 오류:", err);
-            updateResult("서버 요청 중 오류가 발생했습니다.");
-        });
-}
-
-// 환경설정 불러오기
-    function loadSettings() {
-        chrome.storage.local.get(
-            ["summaryFontSize", "summaryOutputFormat"],
-            (settings) => {
-                summaryFontSizeInput.value = settings.summaryFontSize || 14;
-                summaryOutputFormatSelect.value = settings.summaryOutputFormat || "inline";
-                console.log("환경설정 로드 완료:", settings);
+            if (scriptResults && scriptResults.length > 0 && scriptResults[0].result) {
+                extractedText = scriptResults[0].result.text;
+                pageTitle = scriptResults[0].result.title;
+            } else {
+                console.warn("getPageData: 일반 웹페이지 스크립트 결과 없음 또는 유효하지 않음:", scriptResults);
             }
-        );
+        } catch (error) {
+            console.error("getPageData: 일반 웹페이지 데이터 추출 스크립트 오류:", error);
+        }
     }
-    
-//이력 날짜순 정렬 저장
-function saveHistory(url, text, title, summary) {
-    const today = new Date().toISOString();
 
-    chrome.storage.local.get(["summaryHistory"], (result) => {
-        const historyArray = result.summaryHistory || [];
-
-        const newEntry = {
-            url,
-            text,
-            title,
-            summary,
-            date: today,
-        };
-
-        historyArray.unshift(newEntry);
-
-        // 최신 날짜 순으로 정렬
-        historyArray.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        chrome.storage.local.set({ summaryHistory: historyArray }, () => {
-            console.log("요약 이력 저장 완료");
-        });
-    });
+    return {
+        url: currentUrl,
+        urlType: urlType,
+        text: extractedText,
+        title: pageTitle,
+        isYoutube: isYoutube,
+    };
 }
