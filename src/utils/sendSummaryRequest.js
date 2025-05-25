@@ -5,7 +5,7 @@ import { renderHistory } from "../history/renderhistory.js"; // renderHistory �
 
 // sendSummaryRequest 함수
 // async function sendSummaryRequest(url, text, title, language, fontSize, outputFormat, isYoutube, fetch_url) { // 기존 주석 처리된 라인
-export async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYoutube, fetch_url) {
+export async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYoutube, fetch_url,popupX,popupY) {
     const payload = {
         url: url,
         //language : language, // 번역 모델이 추가되면 번역을 서버가 수행해야하니 payload에 포함
@@ -47,19 +47,69 @@ export async function sendSummaryRequest(url, text, title, fontSize, outputForma
         const summary = data.response || "요약 결과를 받지 못했습니다.";
 
         if (outputFormat === "popup") {
-            const popup = window.open("", "summaryPopup", "width=400,height=300");
-            if (popup) {
-                // 팝업 CSS를 포함하여 더 나은 모양을 제공할 수 있습니다.
-                popup.document.head.innerHTML = `<style>body { font-family: sans-serif; margin: 15px; line-height: 1.5; }</style>`;
-                popup.document.body.innerHTML = `<p style="font-size:${fontSize}px;">${summary}</p>`;
-                popup.document.title = "요약 결과";
-            } else {
-                alert("팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.");
-                updateResult("팝업이 차단되었습니다."); // 임포트된 updateResult 사용
-            }
+            // 새 팝업창으로 출력
+            chrome.windows.create(
+                {
+                    url: "data:text/html," + encodeURIComponent(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>${title || '요약 결과'}</title>
+                            <style>
+                                body { 
+                                    font-family: 'Segoe UI', sans-serif; 
+                                    padding: 20px; 
+                                    line-height: 1.6; 
+                                    word-wrap: break-word; 
+                                    background-color: #f4f7f6; 
+                                    color: #333; 
+                                    margin: 0;
+                                }
+                                h1 { 
+                                    font-size: 1.2em; 
+                                    color: #007bff; 
+                                    margin-bottom: 15px; 
+                                }
+                                pre { 
+                                    white-space: pre-wrap; 
+                                    word-wrap: break-word; 
+                                    font-size: ${fontSize || 14}px; 
+                                    background-color: #ffffff; 
+                                    padding: 15px; 
+                                    border-radius: 8px; 
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+                                    border: 1px solid #e0e0e0;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <h1>${title || '요약 결과'}</h1>
+                            <pre>${summary}</pre>
+                        </body>
+                        </html>
+                    `),
+                    type: "popup",
+                    width: 400, // 기본 너비
+                    height: 600, // 기본 높이
+                    left: popupX, // 사용자 설정 X 좌표 적용
+                    top: popupY,  // 사용자 설정 Y 좌표 적용
+                },
+                (newWindow) => {
+                    if (newWindow) {
+                        console.log("새 팝업창 생성됨:", newWindow);
+                        // 팝업 생성 성공 시 타이머 중지 및 최종 메시지 표시
+                        // message, startTimer, stopTimer, isSummaryContent, fontSize, title, type
+                        updateResult("요약 결과를 새 팝업창으로 출력했습니다.", false, true, false, 14, "", "success");
+                    } else {
+                        console.warn("팝업창 생성에 실패했습니다. 팝업 차단 여부를 확인하세요.");
+                        // 팝업 생성 실패 시 타이머 중지 및 에러 메시지 표시
+                        updateResult("팝업이 차단되었거나 생성에 실패했습니다.", false, true, false, 14, "", "error");
+                    }
+                }
+            );
         } else {
             // 이 함수는 팝업 HTML에서 결과를 표시하는 요소를 업데이트합니다.
-            updateResult(summary, false, true); // 임포트된 updateResult 사용
+            updateResult(summary, false, true, true, fontSize, title, "success"); // 임포트된 updateResult 사용
         }
          // 요약이 성공적으로 완료되면 이력 저장
         return { summary, url, title, text };

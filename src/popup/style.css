@@ -66,6 +66,7 @@ button {
     border-radius: 12px;
     width: 100%;
     cursor: pointer;
+    margin-top: 10px; 
 }
 #cancelLoginBtn {
     /* 취소 버튼 색상 (예시) */
@@ -92,6 +93,8 @@ button {
 h2 {
     font-size: 1.5em;
     font-weight: bold;
+    color: #007bff;
+    margin-bottom: 15px;
 }
 
 .subtext {
@@ -100,38 +103,54 @@ h2 {
 }
 
 .form-group {
-    margin: 15px 0;
+    margin-bottom: 15px;
     text-align: left;
 }
-
-input[type="email"],
-input[type="password"] {
-    width: 100%;
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+.form-group input-wrapper {
+    position: relative;
+}
+.form-group input-wrapper input {
+    width: calc(100% - 30px); 
     padding: 10px;
-    margin-top: 4px;
-    box-sizing: border-box;
-    border-radius: 6px;
     border: 1px solid #ccc;
+    border-radius: 8px;
     font-size: 1em;
+}
+.form-group .password-toggle-icon {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    padding: 5px;
+}
+.form-group input::placeholder {
+    color: #aaa;
 }
 
 .options {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
     font-size: 0.9em;
-    margin: 10px 0;
+}
+.options a {
+    color: #007bff;
+    text-decoration: none;
 }
 
-.action-btn {
-    display: block;
-    width: 100%;
-    background-color: #007aff;
-    color: white;
-    padding: 12px;
-    margin: 10px 0;
-    border: none;
+#settings-container {
+    max-width: 400px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 20px;
     border-radius: 12px;
-    font-size: 1em;
-    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }

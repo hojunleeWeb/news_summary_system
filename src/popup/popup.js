@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const historyBtn = document.getElementById("historyBtn");
 
     // settings.js에 정의된 setupSettings 함수 호출
-    setupSettings(settingsContainer, loginContainer, updateResult); // updateResult 함수를 인자로 전달
+    setupSettings(settingsContainer, loginContainer, updateResult, summarizeBtn);
 
     // 로그인 상태를 업데이트하는 함수.
     // 이 함수는 login.js와 popup.js 모두에서 사용되므로 상위 스코프에 정의합니다.
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             } catch (error) {
                 console.error("사이드 패널을 여는 데 실패했습니다:", error);
-                updateResult("이력 조회를 열 수 없습니다. 브라우저 설정을 확인해주세요.");
+                updateResult("이력 조회를 열 수 없습니다. 브라우저 설정을 확인해주세요.", false, true);
             }
         });
     }
@@ -68,39 +68,42 @@ document.addEventListener("DOMContentLoaded", () => {
     // 요약하기 버튼 클릭 이벤트
     if (summarizeBtn) {
         summarizeBtn.addEventListener("click", async () => {
-            updateResult("페이지 데이터 추출 중..."); // 임포트된 updateResult 사용
+            updateResult("요약 중...", true, false);
             settingsContainer.style.display = "none";
             loginContainer.style.display = "none";
 
             try {
                 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
                 if (!tab || !tab.id || !tab.url) {
-                    updateResult("활성 탭 정보를 가져올 수 없습니다.");
+                    updateResult("활성 탭 정보를 가져올 수 없습니다.", false, true, false, 14, "", "error")
                     console.error("활성 탭 정보를 가져올 수 없습니다.");
                     return;
                 }
                 if (tab.url.startsWith("chrome://") || tab.url.startsWith("chrome-extension://")) {
-                    updateResult("이 페이지는 요약할 수 없습니다.");
+                    updateResult("이 페이지는 요약할 수 없습니다.", false, true, false, 14, "", "error");
                     return;
                 }
                 const pageData = await getPageData(tab.id, tab.url, tab.title);
                 console.log("popup.js: 추출된 페이지 데이터:", pageData);
                 if (pageData.urlType === "unsupported") {
-                    updateResult("죄송합니다. 현재 페이지는 요약이 지원되지 않습니다.");
+                    updateResult("죄송합니다. 현재 페이지는 요약이 지원되지 않습니다.", false, true, false, 14, "", "error");
                     return;
                 } else if (pageData.urlType !== "youtube" && (!pageData.text || pageData.text.length < 50)) {
-                    updateResult("페이지 본문 추출에 실패했거나, 충분한 텍스트를 찾을 수 없습니다.");
+                    updateResult("페이지 본문 추출에 실패했거나, 충분한 텍스트를 찾을 수 없습니다.", false, true, false, 14, "", "error");
                     console.error("본문 추출 실패: 텍스트 길이가 너무 짧거나 없음.", pageData);
                     return;
                 }
                 const settings = await new Promise((resolve) => {
-                    chrome.storage.local.get(["summaryLanguage", "summaryFontSize", "summaryOutputFormat"], (items) =>
-                        resolve(items)
+                    chrome.storage.local.get(
+                        ["summaryLanguage", "summaryFontSize", "summaryOutputFormat", "popupX", "popupY"],
+                        (items) => resolve(items)
                     );
                 });
                 //const language = settings.summaryLanguage || "한국어";
                 const fontSize = settings.summaryFontSize || 14;
                 const outputFormat = settings.summaryOutputFormat || "inline";
+                const popupX = settings.popupX !== undefined ? settings.popupX : Math.round(window.screen.availWidth / 2 - 200);
+                const popupY = settings.popupY !== undefined ? settings.popupY : Math.round(window.screen.availHeight / 2 - 300);
 
                 await sendSummaryRequest(
                     pageData.url,
@@ -110,17 +113,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     fontSize,
                     outputFormat,
                     pageData.isYoutube,
-                    fetch_url
+                    fetch_url,
+                    popupX,
+                    popupY
                 );
             } catch (error) {
                 console.error("요약 과정 중 오류 발생:", error);
-                updateResult(`오류가 발생했습니다: ${error.message}`);
+                // 오류 발생 시 타이머 중지 및 에러 메시지 표시
+                updateResult(`오류가 발생했습니다: ${error.message}`, false, true, false, 14, "", "error");
             }
         });
     }
 });
 
-// getPageData, sendSummaryRequest 함수는 popup.js에 그대로 유지
+// getPageData 함수는 popup.js에 그대로 유지
 async function getPageData(tabId, currentUrl, defaultTitle) {
     const YOUTUBE_PATTERN = /^https?:\/\/www\.(?:youtube\.com|youtu\.be)/;
     const NAVER_NEWS_PATTERN = /^https?:\/\/n\.news\.naver\.com\/article\/(\d+)\/(\d+)(?:\?.*)?$/;
@@ -142,7 +148,7 @@ async function getPageData(tabId, currentUrl, defaultTitle) {
                     const titleElement = document.querySelector(".media_end_head_title");
                     const newsTitle = titleElement ? titleElement.innerText.trim() : document.title;
                     const newsAreaElement = document.getElementById("dic_area");
-                    let newsArea = newsAreaElement ? newsAreaElement.innerText.trim() : null;
+                    let newsArea = newsAreaElement ? newsArea.innerText.trim() : null;
 
                     if (newsArea) {
                         newsArea = newsArea

@@ -33,9 +33,8 @@
             <form id="signupform">
                 <div class="form-group">
                     <label for="email">이메일</label>
-                    <input type="email" id="email" placeholder="이메일" />
+                    <input type="email" id="email" placeholder="이메일 주소" />
                 </div>
-
                 <div class="form-group">
                     <label for="password">비밀번호</label>
                     <input type="password" id="password" placeholder="비밀번호" />
@@ -65,7 +64,15 @@
                     <option value="popup">새 팝업창</option>
                 </select>
             </div>
-            <button id="saveSettingsBtn" class="action-btn">설정 저장</button>
+            <div id="popupXGroup" class="form-group" style="display: none;">
+                <label for="popupX">팝업 X 좌표:</label>
+                <input type="number" id="popupX" min="0" value="0" />
+            </div>
+            <div id="popupYGroup" class="form-group" style="display: none;">
+                <label for="popupY">팝업 Y 좌표:</label>
+                <input type="number" id="popupY" min="0" value="0" />
+            </div>
+            <button id="saveSettingsBtn">설정 저장</button>
             <button id="closeSettingsBtn" class="action-btn">닫기</button>
         </div>
     </body>
