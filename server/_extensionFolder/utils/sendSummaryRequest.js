@@ -48,7 +48,7 @@ export async function sendSummaryRequest(url, text, title, imgUrls, fontSize, ou
         console.log("sendSummary data : ", data);
         if (data.response) {
             //todo : 이미지 이력 저장 로직 해야됨
-            add_local_history(url, title, data.response, text); // 이력 저장
+            add_local_history(url, title, data.response, text, data.img_captions); // 이력 저장
         }
         const summary = data.response || "요약 결과를 받지 못했습니다.";
         const img_captions = data.img_captions || [];
