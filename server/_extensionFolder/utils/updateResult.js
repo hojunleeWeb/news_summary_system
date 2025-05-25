@@ -41,8 +41,9 @@ export function updateResult(message, img_captions = null, startTimer = false, s
             captionItem.appendChild(imgElement);
 
             let captionTextElement = document.createElement("em");
-            captionTextElement.textContent = caption_text.slice(5);
             captionTextElement.classList.add("caption-text"); // 캡션 텍스트 스타일링을 위한 클래스
+            console.log("updateResult : ", caption_text);
+            captionTextElement.innerText = caption_text;
             captionItem.appendChild(captionTextElement);
 
             captionsContainer.appendChild(captionItem);

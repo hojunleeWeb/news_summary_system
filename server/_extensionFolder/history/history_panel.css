@@ -117,33 +117,64 @@ h2 {
     transform: translateY(-1px);
 }
 
-.summary-content {
-    white-space: pre-wrap; /* 줄바꿈 및 공백 유지 */
-    max-height: 100px; /* 초기 높이 제한 (4~5줄) */
-    overflow: hidden;
-    text-overflow: ellipsis; /* 넘치는 텍스트 ... 처리 (pre-wrap과 함께 작동하려면 까다로울 수 있음) */
-    cursor: pointer;
-    transition: max-height 0.3s ease-out, overflow 0.3s ease-out; /* 부드러운 전환 효과 */
-    font-size: 0.9em; /* 기본 폰트 사이즈 */
-    color: #666; /* 기본 텍스트 색상 */
-    line-height: 1.4; /* 줄 간격 */
-}
-
-.summary-content.expanded {
-    max-height: none; /* 확장 시 높이 제한 해제 */
-    overflow: visible;
-}
-
-.history-date {
+/* --- URL 스타일 추가 --- */
+.history-url {
+    display: block; /* 한 줄 전체를 차지하도록 */
     font-size: 0.8em;
-    color: #999;
-    text-align: right;
-    margin-top: 10px;
+    color: #007bff; /* 링크 색상 */
+    text-decoration: none; /* 밑줄 제거 */
+    margin-top: -5px; /* 제목과의 간격 조정 */
+    margin-bottom: 10px; /* 아래 내용과의 간격 */
+    word-break: break-all; /* 긴 URL이 줄바꿈되도록 */
 }
 
+.history-url:hover {
+    text-decoration: underline; /* 호버 시 밑줄 표시 */
+    color: #0056b3; /* 호버 시 색상 변경 */
+}
+
+/* --- 새로운 요약 및 이미지 캡션 토글 관련 스타일 --- */
+
+/* 숨김 처리 */
+.hidden {
+    display: none !important; /* 다른 display 속성에 우선하도록 */
+}
+
+/* 요약 내용을 감싸는 래퍼 (미리보기 + 전체 내용) */
+.summary-wrapper {
+    margin-bottom: 10px; /* 요약과 토글 버튼 사이 간격 */
+}
+
+/* 요약 미리보기 (초기 보이는 부분) */
+.summary-preview {
+    font-size: 0.9em;
+    color: #555;
+    line-height: 1.4;
+    cursor: pointer; /* 클릭 가능하다는 시각적 힌트 */
+    /* 넘치는 텍스트를 처리하기 위해 */
+    overflow: hidden;
+    white-space: normal; /* 텍스트가 줄바꿈되도록 */
+    display: -webkit-box; /* 웹킷 기반 브라우저에서 여러 줄 말줄임표 */
+    -webkit-line-clamp: 2; /* 2줄까지만 표시 */
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis; /* ...으로 표시 */
+}
+
+/* 전체 요약 내용 (숨겨져 있다가 토글 시 보임) */
+.summary-full {
+    font-size: 0.9em;
+    line-height: 1.6;
+    margin-top: 5px; /* 미리보기와 전체 요약 전환 시 간격 */
+    margin-bottom: 5px; /* 이미지 캡션이나 버튼과의 간격 */
+    white-space: pre-wrap; /* 줄 바꿈 및 공백 유지 */
+    color: #333; /* 전체 요약은 좀 더 진하게 */
+}
+
+/* 히스토리 항목 내 이미지 캡션 컨테이너 (숨겨져 있다가 토글 시 보임) */
 .history-image-captions-container {
-    display: flex;
-    flex-direction: column; /* 이미지 캡션들이 세로로 쌓이도록 */
+    display: flex; /* JavaScript에서 hidden 클래스가 제거되면 flex로 바뀜 */
+    flex-wrap: wrap;
+    justify-content: center; /* 이미지들이 중앙으로 모이도록 */
     gap: 15px; /* 각 이미지-캡션 아이템 간의 간격 */
     margin-top: 15px; /* 요약 텍스트와의 간격 */
     padding-top: 15px;
@@ -163,6 +194,9 @@ h2 {
     border-radius: 8px;
     padding: 10px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    width: 100%; /* 기본적으로 한 줄에 하나만 */
+    max-width: 200px; /* 너무 커지지 않도록 최대 너비 설정 */
+    box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 */
 }
 
 /* 캡션 이미지 */
@@ -185,9 +219,29 @@ h2 {
     margin: 0; /* p 태그의 기본 마진 제거 */
 }
 
-/* summary-content와 history-image-captions-container 사이의 간격을 위해
-   summary-content의 하단 마진이 필요할 수 있습니다. */
-.history-item .summary-content {
-    /* ... 기존 스타일 ... */
-    margin-bottom: 10px; /* 이미지 캡션이 있을 경우 하단 여백 */
+/* 토글 버튼 스타일 */
+.toggle-details-button {
+    background-color: #e0e0e0; /* 밝은 회색 */
+    color: #333;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+    width: 100%; /* 너비 꽉 채우기 */
+    margin-top: 15px; /* 위쪽 여백 */
+    box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 */
+}
+
+.toggle-details-button:hover {
+    background-color: #d0d0d0; /* 약간 더 진한 회색 */
+}
+
+/* 기타 기존 스타일과의 조화 */
+.history-date {
+    font-size: 0.8em;
+    color: #999;
+    text-align: right;
+    margin-top: 10px;
 }

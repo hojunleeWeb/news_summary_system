@@ -13,10 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const groupedHistory = {}; // 날짜별로 그룹화할 객체
 
             // 최신 날짜순으로 정렬
-            historyArray.sort((a, b) => new Date(b.date) - new Date(a.date));
+            historyArray.sort((a, b) => new Date(a.date) - new Date(b.date));
 
             historyArray.forEach((entry) => {
-                const date = new Date(entry.date).toISOString().split("T")[0]; // YYYY-MM-DD 형식의 날짜 문자열
+                const date = new Date(entry.date).toISOString().split("T")[0]; //YYYY-MM-DD 형식의 날짜 문자열
                 if (!groupedHistory[date]) {
                     groupedHistory[date] = [];
                 }
@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
             itemHeader.classList.add("history-item-header");
 
             const itemTitle = document.createElement("h3");
-            // 이미지 캡션 항목인 경우 제목을 "이미지 캡션" 등으로 설정할 수 있습니다.
             itemTitle.textContent = entry.title || entry.url || "제목 없음";
             itemHeader.appendChild(itemTitle);
 
@@ -128,22 +127,51 @@ document.addEventListener("DOMContentLoaded", () => {
             itemHeader.appendChild(deleteButton);
             listItem.appendChild(itemHeader);
 
-            // 요약 내용 (summary) 렌더링
-            if (entry.summary) {
-                const itemSummary = document.createElement("p");
-                itemSummary.classList.add("summary-content");
-                itemSummary.textContent = entry.summary;
-                itemSummary.addEventListener("click", () => {
-                    itemSummary.classList.toggle("expanded");
+            // --- URL 렌더링 추가 시작 ---
+            if (entry.url) {
+                const urlLink = document.createElement("a");
+                urlLink.classList.add("history-url");
+                urlLink.href = entry.url;
+                urlLink.textContent = entry.url; // URL 텍스트
+                urlLink.target = "_blank"; // 새 탭에서 열리도록
+                urlLink.rel = "noopener noreferrer"; // 보안을 위한 설정
+
+                // 클릭 시 해당 URL로 이동
+                urlLink.addEventListener("click", (event) => {
+                    event.preventDefault(); // 기본 링크 동작 방지
+                    chrome.tabs.create({ url: entry.url }); // 새 탭에서 URL 열기
                 });
-                listItem.appendChild(itemSummary);
+                listItem.appendChild(urlLink);
             }
+            // --- URL 렌더링 추가 끝 ---
 
-            // 이미지 캡션 (img_captions) 렌더링
+            // --- 요약 내용 (summary) 렌더링 수정 시작 ---
+            const itemSummaryWrapper = document.createElement("div"); // 전체 요약을 감싸는 래퍼
+            itemSummaryWrapper.classList.add("summary-wrapper");
+
+            const itemSummaryPreview = document.createElement("p"); // 미리보기용 요약
+            itemSummaryPreview.classList.add("summary-preview");
+            const previewLength = 100; // 미리보기 길이
+            if (entry.summary && entry.summary.length > previewLength) {
+                itemSummaryPreview.textContent = entry.summary.substring(0, previewLength) + "...";
+            } else {
+                itemSummaryPreview.textContent = entry.summary || "요약 내용 없음";
+            }
+            itemSummaryWrapper.appendChild(itemSummaryPreview);
+
+            const itemSummaryFull = document.createElement("p"); // 전체 요약
+            itemSummaryFull.classList.add("summary-full", "hidden"); // 초기에는 숨김
+            itemSummaryFull.textContent = entry.summary || "요약 내용 없음";
+            itemSummaryWrapper.appendChild(itemSummaryFull);
+
+            listItem.appendChild(itemSummaryWrapper);
+            // --- 요약 내용 (summary) 렌더링 수정 끝 ---
+
+            // --- 이미지 캡션 (img_captions) 렌더링 수정 시작 ---
+            const captionsContainer = document.createElement("div");
+            captionsContainer.classList.add("history-image-captions-container", "hidden"); // 초기에는 숨김
+
             if (entry.img_captions && entry.img_captions.length > 0) {
-                const captionsContainer = document.createElement("div");
-                captionsContainer.classList.add("history-image-captions-container"); // history 패널 내 스타일링을 위한 클래스
-
                 entry.img_captions.forEach(([img_src, caption_text], imgIndex) => {
                     const captionItem = document.createElement("div");
                     captionItem.classList.add("history-image-caption-item");
@@ -161,8 +189,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     captionsContainer.appendChild(captionItem);
                 });
-                listItem.appendChild(captionsContainer); // 이미지 캡션 컨테이너를 리스트 아이템에 추가
+            } else {
+                // 이미지 캡션이 없을 때 메시지를 표시할 수도 있습니다.
+                // const noImageMessage = document.createElement("p");
+                // noImageMessage.textContent = "관련 이미지가 없습니다.";
+                // captionsContainer.appendChild(noImageMessage);
             }
+            listItem.appendChild(captionsContainer); // 이미지 캡션 컨테이너를 리스트 아이템에 추가
+            // --- 이미지 캡션 (img_captions) 렌더링 수정 끝 ---
+
+            // --- 토글 버튼 추가 ---
+            const toggleButton = document.createElement("button");
+            toggleButton.textContent = "자세히 보기";
+            toggleButton.classList.add("toggle-details-button");
+            toggleButton.addEventListener("click", () => {
+                // 전체 요약과 이미지 캡션 컨테이너의 'hidden' 클래스를 토글합니다.
+                itemSummaryFull.classList.toggle("hidden");
+                captionsContainer.classList.toggle("hidden");
+
+                // 미리보기 요약은 숨깁니다.
+                itemSummaryPreview.classList.toggle("hidden");
+
+                // 버튼 텍스트 변경
+                if (itemSummaryFull.classList.contains("hidden")) {
+                    toggleButton.textContent = "자세히 보기";
+                } else {
+                    toggleButton.textContent = "간략히 보기";
+                }
+            });
+            listItem.appendChild(toggleButton);
+            // --- 토글 버튼 추가 끝 ---
 
             const itemDate = document.createElement("p");
             itemDate.classList.add("history-date");
