@@ -8,5 +8,5 @@ def find_user_by_credentials(user_id, user_pw):
             return user
         return None
     except Exception as e:
-        print(f"데이터베이스 오류 발생: {e}")
+        print(f"find_user_by_credentials 데이터베이스 오류 발생: {e}")
         return None

@@ -1,6 +1,6 @@
 from flask import request, jsonify, make_response, session
 from database import db, SummaryRecord, User
-from videoTransSrc.video2text import video2text
+from dataProcessing.video2text import video2text
 from responseSrc.asao_control import asao_control
 from responseSrc.response_summary import response_summary
 from responseSrc.login_auth_db import find_user_by_credentials

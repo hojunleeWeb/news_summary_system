@@ -30,6 +30,14 @@ class User(db.Model):
     def __repr__(self):
         return f"<User(input='{self.user_id}', response='{self.user_pw}')>"
 
+class Images(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    url = db.Column(db.Text, nullable=False) # 사이트 url
+    img_url = db.Column(db.Text, nullable=False) # 이미지 url -> 즉 동일한 사이트 url에 여러 이미지가 있을 수 있다.
+    caption = db.Column(db.Text, nullable=False)
+    def __repr__(self):
+        return f"<Image(url='{self.url}', caption='{self.caption}')>"
+
 #db 초기화
 def init_db(app):
     db.init_app(app)

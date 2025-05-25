@@ -135,3 +135,20 @@ input[type="password"] {
     font-size: 1em;
     cursor: pointer;
 }
+.image-caption-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 3px;
+}
+img {
+    width: 100%;
+    height: auto;
+}
+em {
+    font-style: italic;
+    color: #555;
+    font-size: 0.9em;
+    display: block;
+}

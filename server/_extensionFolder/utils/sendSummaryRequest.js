@@ -1,15 +1,17 @@
 // src/api/summaryApi.js (예시 파일 경로)
 
+import { add_local_history } from "../history/add_local_history.js";
 import { updateResult } from "../utils/updateResult.js"; // updateResult 함수 임포트
 
 // sendSummaryRequest 함수
 // async function sendSummaryRequest(url, text, title, language, fontSize, outputFormat, isYoutube, fetch_url) { // 기존 주석 처리된 라인
-export async function sendSummaryRequest(url, text, title, fontSize, outputFormat, isYoutube, fetch_url) {
+export async function sendSummaryRequest(url, text, title, imgUrls, fontSize, outputFormat, isYoutube, fetch_url) {
     const payload = {
         url: url,
         //language : language, // 번역 모델이 추가되면 번역을 서버가 수행해야하니 payload에 포함
         title: "",
         text: "",
+        imgUrls: [],
         isYoutube: isYoutube,
     };
 
@@ -17,13 +19,14 @@ export async function sendSummaryRequest(url, text, title, fontSize, outputForma
     if (!isYoutube) {
         payload.text = text;
         payload.title = title; // 텍스트와 함께 제목도 전달
+        payload.imgUrls = imgUrls || []; // 이미지 URL이 있을 경우에만 포함
     } else {
         payload.title = title; // YouTube인 경우에도 제목은 전달
     }
 
     // 결과 메시지를 초기화하거나 "요약 중..."으로 변경하여 사용자에게 피드백 제공
     // 요약 시작 시 "요약 중..." 메시지와 함께 타이머 시작
-    updateResult("요약 중...", true);
+    updateResult("요약 중...", null, true, false);
 
     try {
         const response = await fetch(fetch_url + "/post_summary", {
@@ -42,8 +45,13 @@ export async function sendSummaryRequest(url, text, title, fontSize, outputForma
         }
 
         const data = await response.json();
-        console.log(data);
+        console.log("sendSummary data : ", data);
+        if (data.response) {
+            //todo : 이미지 이력 저장 로직 해야됨
+            add_local_history(url, title, data.response, text); // 이력 저장
+        }
         const summary = data.response || "요약 결과를 받지 못했습니다.";
+        const img_captions = data.img_captions || [];
 
         if (outputFormat === "popup") {
             const popup = window.open("", "summaryPopup", "width=400,height=300");
@@ -58,7 +66,7 @@ export async function sendSummaryRequest(url, text, title, fontSize, outputForma
             }
         } else {
             // 이 함수는 팝업 HTML에서 결과를 표시하는 요소를 업데이트합니다.
-            updateResult(summary, false, true); // 임포트된 updateResult 사용
+            updateResult(summary, img_captions, false, true); // 임포트된 updateResult 사용
         }
 
         // TODO: 요약이 성공적으로 완료되면 여기에서 renderHistory를 호출하지 않고,

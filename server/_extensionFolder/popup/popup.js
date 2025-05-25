@@ -7,7 +7,7 @@ import { updateResult } from "../utils/updateResult.js"; //
 import { sendSummaryRequest } from "../utils/sendSummaryRequest.js"; // 요약 요청을 보내는 함수
 
 // 서버 URL 설정
-let fetch_url = "http://192.168.0.127:5000";
+let fetch_url = "http://192.168.0.128:5000";
 
 document.addEventListener("DOMContentLoaded", () => {
     // 요소들 캐싱
@@ -49,12 +49,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 로그인 리디렉션 버튼 (로그인 컨테이너 토글)
 
-    // 이력조회 버튼 -> 새 탭
+    // 이력조회 버튼
     if (historyBtn) {
-        historyBtn.addEventListener("click", () => {
-            chrome.tabs.create({
-                url: chrome.runtime.getURL("src/history/history.html"),
-            });
+        historyBtn.addEventListener("click", async () => {
+            try {
+                // 현재 활성 탭의 ID를 가져와 Side Panel을 엽니다.
+                // manifest.json의 default_path에 설정된 history_panel.html이 열립니다.
+                const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+                if (currentTab) {
+                    await chrome.sidePanel.open({ tabId: currentTab.id });
+                }
+            } catch (error) {
+                console.error("사이드 패널을 여는 데 실패했습니다:", error);
+                updateResult("이력 조회를 열 수 없습니다. 브라우저 설정을 확인해주세요.", false, true);
+            }
         });
     }
 
@@ -94,12 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 //const language = settings.summaryLanguage || "한국어";
                 const fontSize = settings.summaryFontSize || 14;
                 const outputFormat = settings.summaryOutputFormat || "inline";
-
+                console.log("imgurl : " + pageData.imgUrls);
                 await sendSummaryRequest(
                     pageData.url,
                     pageData.text,
                     pageData.title,
                     //language,
+                    pageData.imgUrls,
                     fontSize,
                     outputFormat,
                     pageData.isYoutube,
@@ -122,6 +131,7 @@ async function getPageData(tabId, currentUrl, defaultTitle) {
     let extractedText = null;
     let pageTitle = defaultTitle || "제목 없음";
     let isYoutube = false;
+    let imgUrls = [];
 
     if (YOUTUBE_PATTERN.test(currentUrl)) {
         urlType = "youtube";
@@ -132,6 +142,19 @@ async function getPageData(tabId, currentUrl, defaultTitle) {
             const scriptResults = await chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 function: () => {
+                    let extractedImgUrls = []; // 스크립트 내부에서 사용할 이미지 URL 배열
+                    // 네이버 뉴스 본문 내 이미지 ID 패턴 확인
+                    for (let i = 1; ; i++) {
+                        const imgElement = document.getElementById("img" + i);
+                        if (imgElement && imgElement.src) {
+                            extractedImgUrls.push(imgElement.src);
+                        } else {
+                            // 더 이상 imgN ID가 없거나 src가 없으면 반복 중단
+                            break;
+                        }
+                    }
+                    console.log("스크립트 내부: 추출된 네이버 뉴스 이미지 URL:", extractedImgUrls);
+
                     const titleElement = document.querySelector(".media_end_head_title");
                     const newsTitle = titleElement ? titleElement.innerText.trim() : document.title;
                     const newsAreaElement = document.getElementById("dic_area");
@@ -148,13 +171,14 @@ async function getPageData(tabId, currentUrl, defaultTitle) {
                             newsArea = newsArea.substring(0, 5000) + "... (전문이 아닐 수 있음)";
                         }
                     }
-                    return { text: newsArea, title: newsTitle };
+                    return { text: newsArea, title: newsTitle, imgUrls: extractedImgUrls };
                 },
             });
 
             if (scriptResults && scriptResults.length > 0 && scriptResults[0].result) {
                 extractedText = scriptResults[0].result.text;
                 pageTitle = scriptResults[0].result.title;
+                imgUrls = scriptResults[0].result.imgUrls || []; // **추출된 imgUrls를 할당합니다.**
             } else {
                 console.warn("getPageData: 네이버 뉴스 스크립트 결과 없음 또는 유효하지 않음:", scriptResults);
             }
@@ -189,6 +213,7 @@ async function getPageData(tabId, currentUrl, defaultTitle) {
             if (scriptResults && scriptResults.length > 0 && scriptResults[0].result) {
                 extractedText = scriptResults[0].result.text;
                 pageTitle = scriptResults[0].result.title;
+                imgUrls = scriptResults[0].result.imgUrls || []; // **추출된 imgUrls를 할당합니다.**
             } else {
                 console.warn("getPageData: 일반 웹페이지 스크립트 결과 없음 또는 유효하지 않음:", scriptResults);
             }
@@ -203,5 +228,6 @@ async function getPageData(tabId, currentUrl, defaultTitle) {
         text: extractedText,
         title: pageTitle,
         isYoutube: isYoutube,
+        imgUrls: imgUrls, // **최종적으로 imgUrls를 반환 객체에 포함시킵니다.**
     };
 }
