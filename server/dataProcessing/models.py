@@ -127,6 +127,6 @@ def translate_text_to_korean(text):
         output = translator(input_text, max_length=512)
         translated_text = output[0]["translation_text"]
         print("translate_text_to_korean 최종 한국어 캡션 (번역 완료):", translated_text)
-        return translated_text
+        return translated_text[5:]
     except Exception as e:
         return f"translate_text_to_korean 번역 중 오류 발생: {e}"

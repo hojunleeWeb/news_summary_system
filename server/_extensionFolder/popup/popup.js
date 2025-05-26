@@ -7,7 +7,9 @@ import { updateResult } from "../utils/updateResult.js"; //
 import { sendSummaryRequest } from "../utils/sendSummaryRequest.js"; // 요약 요청을 보내는 함수
 
 // 서버 URL 설정
-let fetch_url = "http://192.168.0.128:5000";
+//let fetch_url = "http://192.168.0.128:5000";
+// let fetch_url = "http://127.0.0.1:5000"; // 로컬 개발용 URL
+let fetch_url = "http://192.168.96.187:5000";
 
 document.addEventListener("DOMContentLoaded", () => {
     // 요소들 캐싱
@@ -125,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // getPageData, sendSummaryRequest 함수는 popup.js에 그대로 유지
 async function getPageData(tabId, currentUrl, defaultTitle) {
     const YOUTUBE_PATTERN = /^https?:\/\/www\.(?:youtube\.com|youtu\.be)/;
-    const NAVER_NEWS_PATTERN = /^https?:\/\/n\.news\.naver\.com\/article\/(\d+)\/(\d+)(?:\?.*)?$/;
+    const NAVER_NEWS_PATTERN = /^https?:\/\/n\.news\.naver\.com/;
 
     let urlType = "unsupported";
     let extractedText = null;

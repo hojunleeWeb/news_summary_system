@@ -66,7 +66,7 @@ export async function sendSummaryRequest(url, text, title, imgUrls, fontSize, ou
             }
         } else {
             // 이 함수는 팝업 HTML에서 결과를 표시하는 요소를 업데이트합니다.
-            updateResult(summary, img_captions, false, true); // 임포트된 updateResult 사용
+            updateResult(summary, img_captions, false, true, fontSize); // 임포트된 updateResult 사용
         }
 
         // TODO: 요약이 성공적으로 완료되면 여기에서 renderHistory를 호출하지 않고,

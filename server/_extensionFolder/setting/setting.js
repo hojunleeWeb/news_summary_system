@@ -45,6 +45,7 @@ export function setupSettings(settingsContainer, loginContainer, updateResult) {
                 () => {
                     console.log("환경설정 저장 완료:", { fontSize, outputFormat });
                     settingsContainer.style.display = "none"; // 설정 저장 후 창 닫기
+                    summarizeBtn.style.display = "block"; // 설정창 닫을 때 요약 버튼 보이기
                     updateResult("설정이 저장되었습니다.", resultDiv); // resultDiv를 인자로 전달
                     setTimeout(() => {
                         resultDiv.textContent = "";

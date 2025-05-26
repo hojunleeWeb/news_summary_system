@@ -10,12 +10,13 @@ let startTime;
  * @param {boolean} [startTimer=false] - 타이머를 시작할지 여부입니다.
  * @param {boolean} [stopTimer=false] - 타이머를 중지할지 여부입니다.
  */
-export function updateResult(message, img_captions = null, startTimer = false, stopTimer = false) {
+export function updateResult(message, img_captions = null, startTimer = false, stopTimer = false, fontSize = "16px") {
     console.log("updateResult 호출됨:", {
         message,
         img_captions,
         startTimer,
         stopTimer,
+        fontSize,
     });
     const resultDiv = document.getElementById("result");
     if (!resultDiv) return;
@@ -69,8 +70,8 @@ export function updateResult(message, img_captions = null, startTimer = false, s
         }, 1000); // 1초마다 업데이트
     } else {
         // 타이머 시작/중지 요청이 없으면 단순히 메시지만 업데이트
-        const messageSpan = document.createElement("span");
-        messageSpan.textContent = message;
+        let messageSpan = document.createElement("span");
+        messageSpan.innerHTML = `<span style="font-size:${fontSize}px;">${message}</span>`;
         resultDiv.appendChild(messageSpan);
     }
 }
