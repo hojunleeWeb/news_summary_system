@@ -8,8 +8,9 @@ import { sendSummaryRequest } from "../utils/sendSummaryRequest.js"; // 요약 �
 
 // 서버 URL 설정
 //let fetch_url = "http://192.168.0.128:5000";
-// let fetch_url = "http://127.0.0.1:5000"; // 로컬 개발용 URL
-let fetch_url = "http://192.168.96.187:5000";
+let fetch_url = "http://127.0.0.1:5000"; // 로컬 개발용 URL
+//let fetch_url = "http://192.168.96.187:5000";
+//let fetch_url = "https://10.22.188.41:5000"; // cnu wifi
 
 document.addEventListener("DOMContentLoaded", () => {
     // 요소들 캐싱

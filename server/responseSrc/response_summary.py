@@ -18,9 +18,9 @@ def response_summary():
             is_youtube = data.get('isYoutube', False) # 클라이언트에서 _y로 전송
             user_id = session.get('user_id', 'none') # 세션에 user_id가 없으면 'none'으로 처리
             combined_img_captions = [] # 클라이언트에 전달할 이미지 캡션 리스트
-
+            isItDb = False # DB에 저장된 요약이 있는지 여부
             interaction = SummaryRecord.query.filter_by(url=url).first()
-
+            interaction_sameId = SummaryRecord.query.filter_by(url=url, user_id=user_id).first()
             #동일한 url에 대한 요약 요청이 이전에 있는 경우를 최우선적으로 검색
             if interaction:
                 summary_text = interaction.summarization_text
@@ -30,18 +30,19 @@ def response_summary():
                 img_captions = json.loads(img_captions_json) if img_captions_json else []
                 img_urls = json.loads(img_urls_json) if img_urls_json else []
                 print(f"response_summary: DB에서 동일 URL 요약 발견. 요약 길이: {len(summary_text) if summary_text else 0}")
-                
+                isItDb = True # DB에 저장된 요약이 있는 경우
                 # 이미지 URL과 캡션을 결합하여 클라이언트에 전달할 리스트 생성
+
                 for i in range(min(len(img_urls), len(img_captions))):
                     combined_img_captions.append([img_urls[i], img_captions[i]])
                     # response_summary 함수의 반환값을 사용하는 클라이언트는 img_captions를 [[이미지 URL, 캡션], ...] 형태로 기대하므로
 
-                if(user_id != 'none' and interaction.user_id != user_id):
+                if(user_id != 'none' and interaction_sameId is None):
                 # user_id가 none이 아닐 때 = 로그인을 한 상태일 때만 기록 -> db에 none이 계속 추가되는 일을 방지
                 # 데베에서는 img url와 캡션을 따로 저장한다.
                     add_summary_record(user_id, url, title, summary_text, img_urls, img_captions)
 
-                return jsonify({'response': summary_text, 'img_captions': combined_img_captions}), 200 # results 변수 삭제, 직접 딕셔너리 반환
+                return jsonify({'response': summary_text, 'img_captions': combined_img_captions,'isItDb' : isItDb}), 200 # results 변수 삭제, 직접 딕셔너리 반환
 
             # youtube 영상이면 데이터 후처리 로직
             if is_youtube:
@@ -66,7 +67,7 @@ def response_summary():
                     add_summary_record(user_id, url, title, summary,img_urls, img_captions_list)
 
                     # 여기서도 배열 대신 단일 객체를 반환하도록 수정
-                    return jsonify({'response': summary, 'img_captions': combined_img_captions}), 200
+                    return jsonify({'response': summary, 'img_captions': combined_img_captions, 'isItDb' : False}), 200
 
                 except Exception as e:
                     print(f"요약 생성 오류: {e}")

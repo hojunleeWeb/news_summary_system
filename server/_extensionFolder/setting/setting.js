@@ -14,6 +14,7 @@ export function setupSettings(settingsContainer, loginContainer, updateResult) {
     const summaryLanguageSelect = document.getElementById("summaryLanguage"); // 가정: HTML에 추가된 선택 요소
     const summaryFontSizeInput = document.getElementById("summaryFontSize");
     const summaryOutputFormatSelect = document.getElementById("summaryOutputFormat");
+    const resultDiv = document.getElementById("result");
 
     // 환경설정 버튼 클릭 이벤트
     if (settingsBtn) {
@@ -21,10 +22,11 @@ export function setupSettings(settingsContainer, loginContainer, updateResult) {
             if (settingsContainer.style.display === "none" || settingsContainer.style.display === "") {
                 settingsContainer.style.display = "block";
                 // 로그인 컨테이너 숨기기 (만약 팝업에 있다면)
+                resultDiv.style.display = "none"; // 결과 영역 숨기기
                 loginContainer.style.display = "none";
                 summarizeBtn.style.display = "none"; // 요약 버튼 숨기기
-                updateResult(""); // 설정창 열 때 결과 메시지 초기화
             } else {
+                resultDiv.style.display = "block"; // 결과 영역 보이기
                 settingsContainer.style.display = "none";
                 summarizeBtn.style.display = "block"; // 설정창 닫을 때 요약 버튼 보이기
             }
@@ -46,10 +48,8 @@ export function setupSettings(settingsContainer, loginContainer, updateResult) {
                     console.log("환경설정 저장 완료:", { fontSize, outputFormat });
                     settingsContainer.style.display = "none"; // 설정 저장 후 창 닫기
                     summarizeBtn.style.display = "block"; // 설정창 닫을 때 요약 버튼 보이기
-                    updateResult("설정이 저장되었습니다.", resultDiv); // resultDiv를 인자로 전달
-                    setTimeout(() => {
-                        resultDiv.textContent = "";
-                    }, 2000); // 2초 후 메시지 사라짐
+                    resultDiv.style.display = "block"; // 결과 영역 보이기
+                    alert("설정이 저장되었습니다."); // resultDiv를 인자로 전달
                 }
             );
         });

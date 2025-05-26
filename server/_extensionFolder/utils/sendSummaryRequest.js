@@ -46,7 +46,7 @@ export async function sendSummaryRequest(url, text, title, imgUrls, fontSize, ou
 
         const data = await response.json();
         console.log("sendSummary data : ", data);
-        if (data.response) {
+        if (data.response && !data.isItDb) {
             //todo : 이미지 이력 저장 로직 해야됨
             add_local_history(url, title, data.response, text, data.img_captions); // 이력 저장
         }
